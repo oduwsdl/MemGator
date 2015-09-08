@@ -298,7 +298,11 @@ func serializeLinks(urir string, basetm *list.List, format string, dataCh chan s
 		dataCh <- fmt.Sprintf(`<%s/cdxj/%s>; anchor="%s"; rel="timemap"; type="application/cdxj+ors",`+"\n", *mapbase, urir, urir)
 		dataCh <- fmt.Sprintf(`<%s/%s>; anchor="%s"; rel="timegate"`+"\n", *gatebase, urir, urir)
 	case "json":
-		dataCh <- fmt.Sprintf("{\n"+`  "original_uri": "%s",`+"\n"+`  "mementos": {`+"\n", urir)
+		dataCh <- fmt.Sprintf("{\n"+`  "original_uri": "%s",`+"\n", urir)
+		if !navonly {
+			dataCh <- fmt.Sprintf(`  "self": "%s/json/%s",`+"\n", *mapbase, urir)
+		}
+		dataCh <- fmt.Sprintf(`  "mementos": {`+"\n")
 		if !navonly {
 			dataCh <- `    "list": [`+"\n"
 		}
@@ -330,6 +334,11 @@ func serializeLinks(urir string, basetm *list.List, format string, dataCh chan s
 		dataCh <- fmt.Sprintf(`    "cdxj_format": "%s/cdxj/%s"`+"\n  },\n", *mapbase, urir)
 		dataCh <- fmt.Sprintf(`  "timegate_uri": "%s/%s"`+"\n}\n", *gatebase, urir)
 	case "cdxj":
+		dataCh <- fmt.Sprintf(`@context ["http://tools.ietf.org/html/rfc7089"]`+"\n")
+		if !navonly {
+			dataCh <- fmt.Sprintf(`@id {"uri": "%s/cdxj/%s"}`+"\n", *mapbase, urir)
+		}
+		dataCh <- fmt.Sprintf(`@keys ["memento_datetime_rfc3339"]`+"\n")
 		dataCh <- fmt.Sprintf(`@meta {"original_uri": "%s"}`+"\n", urir)
 		dataCh <- fmt.Sprintf(`@meta {"timegate_uri": "%s/%s"}`+"\n", *gatebase, urir)
 		dataCh <- fmt.Sprintf(`@meta {"timemap_uri": {"link_format": "%s/link/%s", "json_format": "%s/json/%s", "cdxj_format": "%s/cdxj/%s"}`+"\n", *mapbase, urir, *mapbase, urir, *mapbase, urir)
