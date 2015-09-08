@@ -625,7 +625,7 @@ func overrideFlags() {
 }
 
 func serviceInfo() (msg string) {
-	return fmt.Sprintf("TimeMap  : %s/timemap/link|json|cdxj/{URI-R}\nTimeGate : %s/timegate/{URI-R} [Accept-Datetime]\nTimeNav  : %s/timenav/link|json|cdxj/{YYYY[MM[DD[hh[mm[ss]]]]]}/{URI-R}\nRedirect : %s/redirect/{YYYY[MM[DD[hh[mm[ss]]]]]}/{URI-R}\n", *mapbase, *gatebase, *servicebase, *servicebase)
+	return fmt.Sprintf("TimeMap  : %s/link|json|cdxj/{URI-R}\nTimeGate : %s/{URI-R} [Accept-Datetime]\nTimeNav  : %s/timenav/link|json|cdxj/{YYYY[MM[DD[hh[mm[ss]]]]]}/{URI-R}\nRedirect : %s/redirect/{YYYY[MM[DD[hh[mm[ss]]]]]}/{URI-R}\n", *mapbase, *gatebase, *servicebase, *servicebase)
 }
 
 func usage() {

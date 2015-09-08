@@ -38,8 +38,8 @@ When run as a Web Service, MemGator exposes three customizable endpoints as foll
 
 ```
 $ memgator [options] server
-TimeMap  : http://localhost:1208/timemap/timemap/link|json|cdxj/{URI-R}
-TimeGate : http://localhost:1208/timegate/timegate/{URI-R} [Accept-Datetime]
+TimeMap  : http://localhost:1208/timemap/link|json|cdxj/{URI-R}
+TimeGate : http://localhost:1208/timegate/{URI-R} [Accept-Datetime]
 TimeNav  : http://localhost:1208/timenav/link|json|cdxj/{YYYY[MM[DD[hh[mm[ss]]]]]}/{URI-R}
 Redirect : http://localhost:1208/redirect/{YYYY[MM[DD[hh[mm[ss]]]]]}/{URI-R}
 ```
@@ -48,7 +48,7 @@ The `TimeMap` and `TimeGate` responses are in accordance with the [Memento RFC](
 
 ## Download and Install
 
-Depending on the machine and operating system download appropriate binary from the releases page. Changed the mode of the file to executable `chmod +x MemGator-BINARY`. Run from the current location of the downloaded binary or rename it to `memgator` and move it into a directory that is in the `PATH` (such as `/usr/local/bin/`).
+Depending on the machine and operating system download appropriate binary from the [releases page](https://github.com/oduwsdl/memgator/releases). Changed the mode of the file to executable `chmod +x MemGator-BINARY`. Run from the current location of the downloaded binary or rename it to `memgator` and move it into a directory that is in the `PATH` (such as `/usr/local/bin/`).
 
 ## Running as a Docker Container
 
