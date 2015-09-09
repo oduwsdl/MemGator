@@ -638,6 +638,7 @@ func serviceInfo() (msg string) {
 }
 
 func usage() {
+	fmt.Fprintf(os.Stderr, "%s %s\n", Name, Version)
 	fmt.Fprintf(os.Stderr, "\nUsage:\n")
 	fmt.Fprintf(os.Stderr, "  %s [options] {URI-R}                                # TimeMap CLI\n", os.Args[0])
 	fmt.Fprintf(os.Stderr, "  %s [options] {URI-R} {YYYY[MM[DD[hh[mm[ss]]]]]}     # TimeGate CLI\n", os.Args[0])
