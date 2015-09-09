@@ -62,6 +62,8 @@ $ docker run ibnesayeed/memgator [options] server
 ### Full Usage
 
 ```
+MemGator {Version}
+
 Usage:
   memgator [options] {URI-R}                                # TimeMap CLI
   memgator [options] {URI-R} {YYYY[MM[DD[hh[mm[ss]]]]]}     # TimeGate CLI
