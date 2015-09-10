@@ -542,6 +542,7 @@ func memgatorService(w http.ResponseWriter, r *http.Request, urir string, format
 		}
 		lnkhdr = strings.Replace(lnkhdr, "\n", " ", -1)
 		w.Header().Set("Link", lnkhdr)
+		w.Header().Set("Vary", "accept-datetime")
 		http.Redirect(w, r, closest, http.StatusFound)
 		return
 	}
