@@ -52,7 +52,10 @@ Depending on the machine and operating system download appropriate binary from t
 
 ## Running as a Docker Container
 
+The first command below is not necessary, but it allows pulling the latest version of the MemGator Docker image.
+
 ```
+$ docker pull ibnesayeed/memgator
 $ docker run ibnesayeed/memgator -h
 $ docker run ibnesayeed/memgator [options] {URI-R}
 $ docker run ibnesayeed/memgator [options] {URI-R} {YYYY[MM[DD[hh[mm[ss]]]]]}
