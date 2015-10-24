@@ -94,7 +94,7 @@ Options:
 
 ## Build
 
-Assuming that Git and Go are installed, the `GOPATH` environment variable is set to the Go Workspace directory as described in the [How to Write Go Code](https://golang.org/doc/code.html), and `PATH` includes `$GOPATH/bin`. Cloning, building, and running the code can be done using following commands:
+Assuming that Git and Go (version >= 1.3) are installed, the `GOPATH` environment variable is set to the Go Workspace directory as described in the [How to Write Go Code](https://golang.org/doc/code.html), and `PATH` includes `$GOPATH/bin`. Cloning, building, and running the code can be done using following commands:
 
 ```
 $ cd $GOPATH
