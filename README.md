@@ -66,6 +66,11 @@ $ docker run ibnesayeed/memgator [options] server
 
 ```
 MemGator {Version}
+   _____                  ________       __
+  /     \  _____  _____  /  _____/______/  |____________
+ /  \ /  \/  __ \/     \/   \  ___\__  \   __/ _ \_   _ \
+/    Y    \  ___/  Y Y  \    \_\  \/ __ |  |( (_) |  | \/
+\____|____/\____\__|_|__/\________(_____|__| \___/|__|
 
 Usage:
   memgator [options] {URI-R}                                # TimeMap CLI

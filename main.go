@@ -21,6 +21,13 @@ import (
 const (
 	Name    = "MemGator"
 	Version = "1.0-beta"
+	Art     = `
+   _____                  ________       __
+  /     \  _____  _____  /  _____/______/  |____________
+ /  \ /  \/  __ \/     \/   \  ___\__  \   __/ _ \_   _ \
+/    Y    \  ___/  Y Y  \    \_\  \/ __ |  |( (_) |  | \/
+\____|____/\____\__|_|__/\________(_____|__| \___/|__|
+`
 )
 
 var (
@@ -638,9 +645,13 @@ func serviceInfo() (msg string) {
 	return fmt.Sprintf("TimeMap  : %s/link|json|cdxj/{URI-R}\nTimeGate : %s/{URI-R} [Accept-Datetime]\nTimeNav  : %s/timenav/link|json|cdxj/{YYYY[MM[DD[hh[mm[ss]]]]]}/{URI-R}\nRedirect : %s/redirect/{YYYY[MM[DD[hh[mm[ss]]]]]}/{URI-R}\n", *mapbase, *gatebase, *servicebase, *servicebase)
 }
 
+func appInfo() (msg string) {
+	return fmt.Sprintf("%s %s%s\n", Name, Version, Art)
+}
+
 func usage() {
-	fmt.Fprintf(os.Stderr, "%s %s\n", Name, Version)
-	fmt.Fprintf(os.Stderr, "\nUsage:\n")
+	fmt.Fprintf(os.Stderr, appInfo())
+	fmt.Fprintf(os.Stderr, "Usage:\n")
 	fmt.Fprintf(os.Stderr, "  %s [options] {URI-R}                                # TimeMap CLI\n", os.Args[0])
 	fmt.Fprintf(os.Stderr, "  %s [options] {URI-R} {YYYY[MM[DD[hh[mm[ss]]]]]}     # TimeGate CLI\n", os.Args[0])
 	fmt.Fprintf(os.Stderr, "  %s [options] server                                 # Run as a Web Service\n", os.Args[0])
@@ -710,8 +721,9 @@ func main() {
 		os.Exit(1)
 	}
 	if target == "server" {
-		addr := fmt.Sprintf(":%d", *port)
+		fmt.Printf(appInfo())
 		fmt.Printf(serviceInfo())
+		addr := fmt.Sprintf(":%d", *port)
 		http.HandleFunc("/", welcome)
 		http.ListenAndServe(addr, http.HandlerFunc(router))
 	} else {
