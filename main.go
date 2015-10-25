@@ -755,9 +755,14 @@ func main() {
 			os.Exit(1)
 		}
 		var dttm *time.Time
-		if regs["dttmstr"].MatchString(flag.Arg(1)) {
-			dttm, err = paddedTime(flag.Arg(1))
-			if err != nil {
+		if rawdtm := flag.Arg(1); rawdtm != "" {
+			if regs["dttmstr"].MatchString(rawdtm) {
+				dttm, err = paddedTime(rawdtm)
+				if err != nil {
+					os.Exit(1)
+				}
+			} else {
+				logError.Printf("Malformed datetime {YYYY[MM[DD[hh[mm[ss]]]]]}: %s", rawdtm)
 				os.Exit(1)
 			}
 		}
