@@ -632,14 +632,12 @@ func router(w http.ResponseWriter, r *http.Request) {
 	}
 	urir, err = parseUri(rawuri)
 	if err != nil {
-		logError.Printf("Malformed URI-R: %s", rawuri)
 		http.Error(w, "Malformed URI-R: "+rawuri, http.StatusBadRequest)
 		return
 	}
 	if rawdtm != "" {
 		dttm, err = paddedTime(rawdtm)
 		if err != nil {
-			logError.Printf("Malformed datetime: %s", rawdtm)
 			http.Error(w, "Malformed datetime: "+rawdtm+"\nExpected format: YYYY[MM[DD[hh[mm[ss]]]]]", http.StatusBadRequest)
 			return
 		}
