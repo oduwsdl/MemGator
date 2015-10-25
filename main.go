@@ -731,6 +731,7 @@ func main() {
 	}
 	initLoggers()
 	logInfo.Printf("Initializing %s:%s...", Name, Version)
+	logInfo.Printf("Loading archives from %s", *arcsloc)
 	body, err := readArchives()
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Error reading list of archives (%s): %s\n", *arcsloc, err)
