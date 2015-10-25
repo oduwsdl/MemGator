@@ -109,7 +109,7 @@ var mimeMap = map[string]string{
 }
 
 var regs = map[string]*regexp.Regexp{
-	"isprtcl": regexp.MustCompile(`https?://`),
+	"isprtcl": regexp.MustCompile(`^https?://`),
 	"linkdlm": regexp.MustCompile(`\s*"?\s*,\s*<\s*`),
 	"attrdlm": regexp.MustCompile(`\s*>?"?\s*;\s*`),
 	"kvaldlm": regexp.MustCompile(`\s*=\s*"?\s*`),
@@ -415,15 +415,15 @@ func aggregateTimemap(urir string, dttmp *time.Time, sess *Session) (basetm *lis
 }
 
 func parseUri(uri string) (urir string, err error) {
+	if !regs["isprtcl"].MatchString(uri) {
+		uri = "http://" + uri
+	}
 	u, err := url.Parse(uri)
 	if err != nil {
 		logError.Printf("URI parsing error (%s): %v", uri, err)
 		return
 	}
-	if u.Scheme == "" {
-		urir = "http://" + uri
-	}
-	urir = uri
+	urir = u.String()
 	return
 }
 
