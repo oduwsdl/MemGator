@@ -206,7 +206,7 @@ func extractMementos(lnksplt chan string) (tml *list.List) {
 			Href:     linkmap["href"],
 			Datetime: dtm,
 			Timeobj:  pdtm,
-			Timestr:  pdtm.Format(time.RFC3339),
+			Timestr:  pdtm.Format("20060102150405"),
 		}
 		e := tml.Back()
 		for ; e != nil; e = e.Prev() {
@@ -321,11 +321,11 @@ func serializeLinks(urir string, basetm *list.List, format string, dataCh chan s
 			}
 			if lnk.NavRels != nil {
 				for _, rl := range lnk.NavRels {
-					navs += fmt.Sprintf(`    "%s": {`+"\n"+`      "datetime": "%s",`+"\n"+`      "uri": "%s"`+"\n    },\n", rl, lnk.Timestr, lnk.Href)
+					navs += fmt.Sprintf(`    "%s": {`+"\n"+`      "datetime": "%s",`+"\n"+`      "uri": "%s"`+"\n    },\n", rl, lnk.Timeobj.Format(time.RFC3339), lnk.Href)
 				}
 			}
 			if !navonly {
-				dataCh <- fmt.Sprintf(`      {`+"\n"+`        "datetime": "%s",`+"\n"+`        "uri": "%s"`+"\n      }", lnk.Timestr, lnk.Href)
+				dataCh <- fmt.Sprintf(`      {`+"\n"+`        "datetime": "%s",`+"\n"+`        "uri": "%s"`+"\n      }", lnk.Timeobj.Format(time.RFC3339), lnk.Href)
 				if e.Next() != nil {
 					dataCh <- ",\n"
 				}
@@ -345,7 +345,7 @@ func serializeLinks(urir string, basetm *list.List, format string, dataCh chan s
 		if !navonly {
 			dataCh <- fmt.Sprintf(`@id {"uri": "%s/cdxj/%s"}`+"\n", *mapbase, urir)
 		}
-		dataCh <- fmt.Sprintf(`@keys ["memento_datetime_rfc3339"]`+"\n")
+		dataCh <- fmt.Sprintf(`@keys ["memento_datetime_YYYYMMDDhhmmss"]`+"\n")
 		dataCh <- fmt.Sprintf(`@meta {"original_uri": "%s"}`+"\n", urir)
 		dataCh <- fmt.Sprintf(`@meta {"timegate_uri": "%s/%s"}`+"\n", *gatebase, urir)
 		dataCh <- fmt.Sprintf(`@meta {"timemap_uri": {"link_format": "%s/link/%s", "json_format": "%s/json/%s", "cdxj_format": "%s/cdxj/%s"}`+"\n", *mapbase, urir, *mapbase, urir, *mapbase, urir)
