@@ -107,3 +107,12 @@ $ go get github.com/oduwsdl/memgator
 $ go install github.com/oduwsdl/memgator
 $ memgator http://example.com/
 ```
+
+To compile cross-platform binaries, go to the MemGator source directory and run the `crossbuild.sh` script:
+
+```
+$ cd $GOPATH/src/github.com/oduwsdl/memgator
+$ ./crossbuild.sh
+```
+
+This will generate various binaries in `/tmp/mgbins` directory.
