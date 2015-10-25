@@ -574,37 +574,60 @@ func router(w http.ResponseWriter, r *http.Request) {
 	var dttm *time.Time
 	var err error
 	requri := r.URL.RequestURI()[1:]
-	switch {
-	case regs["tmappth"].MatchString(requri):
-		p := strings.SplitN(requri, "/", 3)
-		format = p[1]
-		rawuri = p[2]
-	case regs["tnavpth"].MatchString(requri):
-		p := strings.SplitN(requri, "/", 4)
-		format = p[1]
-		rawdtm = p[2]
-		rawuri = p[3]
-	case regs["rdrcpth"].MatchString(requri):
-		p := strings.SplitN(requri, "/", 3)
-		format = p[0]
-		rawdtm = p[1]
-		rawuri = p[2]
-	case regs["tgatpth"].MatchString(requri):
-		p := strings.SplitN(requri, "/", 2)
-		format = p[0]
-		rawuri = p[1]
-		gttm := time.Now().UTC()
-		if hdtm := r.Header.Get("Accept-Datetime"); hdtm != "" {
-			gttm, err = time.Parse(time.RFC1123, hdtm)
-			if err != nil {
-				logError.Printf("Error parsing datetime (%s): %v", hdtm, err)
-				http.Error(w, "Malformed datetime: "+hdtm, http.StatusBadRequest)
-				return
-			}
+	endpoint := strings.SplitN(requri, "/", 2)[0]
+	switch endpoint {
+	case "timemap":
+		if regs["tmappth"].MatchString(requri) {
+			p := strings.SplitN(requri, "/", 3)
+			format = p[1]
+			rawuri = p[2]
+		} else {
+			err = fmt.Errorf("/timemap/link|json|cdxj/{URI-R}")
 		}
-		dttm = &gttm
+	case "timenav":
+		if regs["tnavpth"].MatchString(requri) {
+			p := strings.SplitN(requri, "/", 4)
+			format = p[1]
+			rawdtm = p[2]
+			rawuri = p[3]
+		} else {
+			err = fmt.Errorf("/timenav/link|json|cdxj/{YYYY[MM[DD[hh[mm[ss]]]]]}/{URI-R}")
+		}
+	case "redirect":
+		if regs["rdrcpth"].MatchString(requri) {
+			p := strings.SplitN(requri, "/", 3)
+			format = p[0]
+			rawdtm = p[1]
+			rawuri = p[2]
+		} else {
+			err = fmt.Errorf("/redirect/{YYYY[MM[DD[hh[mm[ss]]]]]}/{URI-R}")
+		}
+	case "timegate":
+		if regs["tgatpth"].MatchString(requri) {
+			p := strings.SplitN(requri, "/", 2)
+			format = p[0]
+			rawuri = p[1]
+			gttm := time.Now().UTC()
+			if hdtm := r.Header.Get("Accept-Datetime"); hdtm != "" {
+				gttm, err = time.Parse(time.RFC1123, hdtm)
+				if err != nil {
+					logError.Printf("Error parsing datetime (%s): %v", hdtm, err)
+					http.Error(w, "Malformed Accept-Datetime: "+hdtm+"\nExpected in RFC1123 format", http.StatusBadRequest)
+					return
+				}
+			}
+			dttm = &gttm
+		} else {
+			err = fmt.Errorf("/timegate/{URI-R}")
+		}
 	default:
+		logInfo.Printf("Delegated to default ServerMux: %s", r.URL.RequestURI())
 		http.DefaultServeMux.ServeHTTP(w, r)
+		return
+	}
+	if err != nil {
+		logError.Printf("Malformed request: %s", r.URL.RequestURI())
+		http.Error(w, "Malformed request: "+r.URL.RequestURI()+"\nExpected: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 	urir, err = parseUri(rawuri)
@@ -615,7 +638,7 @@ func router(w http.ResponseWriter, r *http.Request) {
 	if rawdtm != "" {
 		dttm, err = paddedTime(rawdtm)
 		if err != nil {
-			http.Error(w, "Malformed datetime: "+rawdtm, http.StatusBadRequest)
+			http.Error(w, "Malformed datetime: "+rawdtm+"\nExpected format: YYYY[MM[DD[hh[mm[ss]]]]]", http.StatusBadRequest)
 			return
 		}
 	}
@@ -732,9 +755,14 @@ func main() {
 			os.Exit(1)
 		}
 		var dttm *time.Time
-		if regs["dttmstr"].MatchString(flag.Arg(1)) {
-			dttm, err = paddedTime(flag.Arg(1))
-			if err != nil {
+		if rawdtm := flag.Arg(1); rawdtm != "" {
+			if regs["dttmstr"].MatchString(rawdtm) {
+				dttm, err = paddedTime(rawdtm)
+				if err != nil {
+					os.Exit(1)
+				}
+			} else {
+				logError.Printf("Malformed datetime {YYYY[MM[DD[hh[mm[ss]]]]]}: %s", rawdtm)
 				os.Exit(1)
 			}
 		}
