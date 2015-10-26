@@ -11,7 +11,8 @@ for GOOS in darwin linux; do
   for GOARCH in 386 amd64; do
     export GOOS=$GOOS
     export GOARCH=$GOARCH
-    go build -v -o $binsdir/memgator-$GOOS-$GOARCH
+    export CGO_ENABLED=0
+    go build -v -a -installsuffix cgo -o $binsdir/memgator-$GOOS-$GOARCH
   done
 done
 
