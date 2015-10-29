@@ -528,9 +528,12 @@ func memgatorService(w http.ResponseWriter, r *http.Request, urir string, format
 	profileTime("AGGREGATOR", "createsess", "Session created", start, sess)
 	logInfo.Printf("Aggregating Mementos for %s", urir)
 	basetm := aggregateTimemap(urir, dttmp, sess)
-	w.Header().Set("X-Generator", Name+":"+Version)
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Expose-Headers", "Link, Location, X-Memento-Count, X-Generator")
+	w.Header().Set("X-Generator", Name+":"+Version)
+	if dttmp == nil {
+		w.Header().Set("X-Memento-Count", fmt.Sprintf("%d", basetm.Len()))
+	}
 	if basetm.Len() == 0 {
 		http.NotFound(w, r)
 		return
@@ -558,7 +561,6 @@ func memgatorService(w http.ResponseWriter, r *http.Request, urir string, format
 	if ok {
 		w.Header().Set("Content-Type", mime)
 	}
-	w.Header().Set("X-Memento-Count", fmt.Sprintf("%d", basetm.Len()))
 	for dt := range dataCh {
 		fmt.Fprintf(w, dt)
 	}
