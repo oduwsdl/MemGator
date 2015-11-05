@@ -226,10 +226,8 @@ func fetchTimemap(urir string, arch Archive, tmCh chan *list.List, wg *sync.Wait
 	start := time.Now()
 	defer wg.Done()
 	url := arch.Timemap + urir
-	expst := 200
 	if dttmp != nil {
 		url = arch.Timegate + urir
-		expst = 302
 	}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -251,9 +249,9 @@ func fetchTimemap(urir string, arch Archive, tmCh chan *list.List, wg *sync.Wait
 		return
 	}
 	defer res.Body.Close()
-	if res.StatusCode != expst {
+	if res.StatusCode != http.StatusOK && res.StatusCode != http.StatusFound {
 		profileTime(arch.Id, "timemapfetch", fmt.Sprintf("Response error in %s, Stutus: %d", arch.Name, res.StatusCode), start, sess)
-		logInfo.Printf("%s => Response error: %s (expected: %d)", arch.Id, res.Status, expst)
+		logInfo.Printf("%s => Response error: %s", arch.Id, res.Status)
 		return
 	}
 	lnks := res.Header.Get("Link")
