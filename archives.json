@@ -18,7 +18,8 @@
     "name": "PastPages Web Archive",
     "timemap": "http://www.pastpages.org/timemap/link/",
     "timegate": "http://www.pastpages.org/timegate/",
-    "probability": 0.001
+    "probability": 0.001,
+    "ignore": true
   },
   {
     "id": "ba",
