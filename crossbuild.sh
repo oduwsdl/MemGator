@@ -25,6 +25,9 @@ for GOOS in windows; do
   done
 done
 
+# Copy the static binary to the bin directroy of the repo
+cp $binsdir/memgator-linux-amd64 ./bin/memgator
+
 echo "Following binaries have been created in $binsdir"
 ls -l $binsdir
 
