@@ -513,7 +513,7 @@ func memgatorCli(urir string, format string, dttmp *time.Time) {
 	dataCh := make(chan string, 1)
 	go serializeLinks(urir, basetm, format, dataCh, navonly, sess)
 	for dt := range dataCh {
-		fmt.Printf(dt)
+		fmt.Print(dt)
 	}
 	logInfo.Printf("Total Mementos: %d in %s", basetm.Len(), time.Since(start))
 }
