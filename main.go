@@ -560,7 +560,7 @@ func memgatorService(w http.ResponseWriter, r *http.Request, urir string, format
 		w.Header().Set("Content-Type", mime)
 	}
 	for dt := range dataCh {
-		fmt.Fprintf(w, dt)
+		fmt.Fprint(w, dt)
 	}
 	logInfo.Printf("Total Mementos: %d in %s", basetm.Len(), time.Since(start))
 }
