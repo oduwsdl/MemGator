@@ -184,7 +184,9 @@ func extractMementos(lnksplt chan string) (tml *list.List) {
 		linkmap := map[string]string{"href": parts[0]}
 		for _, attr := range parts[1:] {
 			kv := regs["kvaldlm"].Split(attr, 2)
-			linkmap[kv[0]] = kv[1]
+			if len(kv) > 1 {
+				linkmap[kv[0]] = kv[1]
+			}
 		}
 		dtm, ok := linkmap["datetime"]
 		if !ok {
