@@ -199,7 +199,7 @@ func extractMementos(lnksplt chan string) (tml *list.List) {
 		if !regs["memento"].MatchString(rel) {
 			continue
 		}
-		pdtm, err := time.Parse(time.RFC1123, dtm)
+		pdtm, err := time.Parse(http.TimeFormat, dtm)
 		if err != nil {
 			logError.Printf("Error parsing datetime (%s): %v", dtm, err)
 			continue
@@ -242,7 +242,7 @@ func fetchTimemap(urir string, arch Archive, tmCh chan *list.List, wg *sync.Wait
 	if dttmp == nil {
 		res, err = client.Do(req)
 	} else {
-		req.Header.Add("Accept-Datetime", dttmp.Format(time.RFC1123))
+		req.Header.Add("Accept-Datetime", dttmp.Format(http.TimeFormat))
 		res, err = transport.RoundTrip(req)
 	}
 	if err != nil {
@@ -611,7 +611,7 @@ func router(w http.ResponseWriter, r *http.Request) {
 			rawuri = p[1]
 			gttm := time.Now().UTC()
 			if hdtm := r.Header.Get("Accept-Datetime"); hdtm != "" {
-				gttm, err = time.Parse(time.RFC1123, hdtm)
+				gttm, err = time.Parse(http.TimeFormat, hdtm)
 				if err != nil {
 					logError.Printf("Error parsing datetime (%s): %v", hdtm, err)
 					http.Error(w, "Malformed Accept-Datetime: "+hdtm+"\nExpected in RFC1123 format", http.StatusBadRequest)
