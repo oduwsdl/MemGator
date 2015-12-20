@@ -6,7 +6,7 @@ A Memento Aggregator CLI and Server in [Go](https://golang.org/).
 
 * The binary (available for various platforms) can be used as the CLI or run as a Web Service
 * Results available in three formats - Link/JSON/CDXJ
-* TimeMap, TimeGate, TimeNave, and Redirect endpoints
+* TimeMap, TimeGate, TimeNav, and Redirect endpoints
 * Good API parity with the [main Memento Aggregator service](http://timetravel.mementoweb.org/guide/api/)
 * Concurrent - Splits every session in subtasks for parallel execution
 * Parallel - Utilizes all the available CPUs
