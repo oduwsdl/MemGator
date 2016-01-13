@@ -59,7 +59,7 @@ type Session struct {
 }
 
 type Archive struct {
-	Id          string  `json:"id"`
+	ID          string  `json:"id"`
 	Name        string  `json:"name"`
 	Timemap     string  `json:"timemap"`
 	Timegate    string  `json:"timegate"`
@@ -233,8 +233,8 @@ func fetchTimemap(urir string, arch Archive, tmCh chan *list.List, wg *sync.Wait
 	}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		profileTime(arch.Id, "timemapfetch", fmt.Sprintf("Request error in %s", arch.Name), start, sess)
-		logError.Printf("%s => Request error: %v", arch.Id, err)
+		profileTime(arch.ID, "timemapfetch", fmt.Sprintf("Request error in %s", arch.Name), start, sess)
+		logError.Printf("%s => Request error: %v", arch.ID, err)
 		return
 	}
 	req.Header.Add("User-Agent", *agent)
@@ -246,27 +246,27 @@ func fetchTimemap(urir string, arch Archive, tmCh chan *list.List, wg *sync.Wait
 		res, err = transport.RoundTrip(req)
 	}
 	if err != nil {
-		profileTime(arch.Id, "timemapfetch", fmt.Sprintf("Network error in %s", arch.Name), start, sess)
-		logError.Printf("%s => Network error: %v", arch.Id, err)
+		profileTime(arch.ID, "timemapfetch", fmt.Sprintf("Network error in %s", arch.Name), start, sess)
+		logError.Printf("%s => Network error: %v", arch.ID, err)
 		return
 	}
 	defer res.Body.Close()
 	if res.StatusCode != http.StatusOK && res.StatusCode != http.StatusFound {
-		profileTime(arch.Id, "timemapfetch", fmt.Sprintf("Response error in %s, Stutus: %d", arch.Name, res.StatusCode), start, sess)
-		logInfo.Printf("%s => Response error: %s", arch.Id, res.Status)
+		profileTime(arch.ID, "timemapfetch", fmt.Sprintf("Response error in %s, Stutus: %d", arch.Name, res.StatusCode), start, sess)
+		logInfo.Printf("%s => Response error: %s", arch.ID, res.Status)
 		return
 	}
 	lnks := res.Header.Get("Link")
 	if dttmp == nil {
 		body, err := ioutil.ReadAll(res.Body)
 		if err != nil {
-			profileTime(arch.Id, "timemapfetch", fmt.Sprintf("Response read error in %s", arch.Name), start, sess)
-			logError.Printf("%s => Response read error: %v", arch.Id, err)
+			profileTime(arch.ID, "timemapfetch", fmt.Sprintf("Response read error in %s", arch.Name), start, sess)
+			logError.Printf("%s => Response read error: %v", arch.ID, err)
 			return
 		}
 		lnks = string(body)
 	}
-	profileTime(arch.Id, "timemapfetch", fmt.Sprintf("TimeMap fethched from %s", arch.Name), start, sess)
+	profileTime(arch.ID, "timemapfetch", fmt.Sprintf("TimeMap fethched from %s", arch.Name), start, sess)
 	start = time.Now()
 	lnkrcvd := make(chan string, 1)
 	lnksplt := make(chan string, 128)
@@ -274,8 +274,8 @@ func fetchTimemap(urir string, arch Archive, tmCh chan *list.List, wg *sync.Wait
 	go splitLinks(lnkrcvd, lnksplt)
 	tml := extractMementos(lnksplt)
 	tmCh <- tml
-	profileTime(arch.Id, "extractmementos", fmt.Sprintf("%d Mementos extracted from %s", tml.Len(), arch.Name), start, sess)
-	logInfo.Printf("%s => Success: %d mementos", arch.Id, tml.Len())
+	profileTime(arch.ID, "extractmementos", fmt.Sprintf("%d Mementos extracted from %s", tml.Len(), arch.Name), start, sess)
+	logInfo.Printf("%s => Success: %d mementos", arch.ID, tml.Len())
 }
 
 func serializeLinks(urir string, basetm *list.List, format string, dataCh chan string, navonly bool, sess *Session) {
@@ -414,7 +414,7 @@ func aggregateTimemap(urir string, dttmp *time.Time, sess *Session) (basetm *lis
 	return
 }
 
-func parseUri(uri string) (urir string, err error) {
+func parseURI(uri string) (urir string, err error) {
 	if !regs["isprtcl"].MatchString(uri) {
 		uri = "http://" + uri
 	}
@@ -632,7 +632,7 @@ func router(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Malformed request: "+r.URL.RequestURI()+"\nExpected: "+err.Error(), http.StatusBadRequest)
 		return
 	}
-	urir, err = parseUri(rawuri)
+	urir, err = parseURI(rawuri)
 	if err != nil {
 		http.Error(w, "Malformed URI-R: "+rawuri, http.StatusBadRequest)
 		return
@@ -753,7 +753,7 @@ func main() {
 		http.HandleFunc("/", welcome)
 		http.ListenAndServe(addr, http.HandlerFunc(router))
 	} else {
-		urir, err := parseUri(target)
+		urir, err := parseURI(target)
 		if err != nil {
 			os.Exit(1)
 		}
