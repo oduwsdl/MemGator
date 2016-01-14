@@ -69,16 +69,16 @@ type Archive struct {
 
 type Archives []Archive
 
-func (slice Archives) Len() int {
-	return len(slice)
+func (a Archives) Len() int {
+	return len(a)
 }
 
-func (slice Archives) Less(i, j int) bool {
-	return slice[i].Probability > slice[j].Probability
+func (a Archives) Less(i, j int) bool {
+	return a[i].Probability > a[j].Probability
 }
 
-func (slice Archives) Swap(i, j int) {
-	slice[i], slice[j] = slice[j], slice[i]
+func (a Archives) Swap(i, j int) {
+	a[i], a[j] = a[j], a[i]
 }
 
 func (a *Archives) filterIgnored() {
