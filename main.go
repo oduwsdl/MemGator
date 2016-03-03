@@ -624,6 +624,7 @@ func router(w http.ResponseWriter, r *http.Request) {
 		}
 	default:
 		logInfo.Printf("Delegated to default ServerMux: %s", r.URL.RequestURI())
+		w.Header().Set("X-Generator", Name+":"+Version)
 		http.DefaultServeMux.ServeHTTP(w, r)
 		return
 	}
