@@ -20,7 +20,7 @@ import (
 
 const (
 	Name    = "MemGator"
-	Version = "1.0-rc3"
+	Version = "1.0-rc4"
 	Art     = `
    _____                  _______       __
   /     \  _____  _____  / _____/______/  |___________
