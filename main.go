@@ -18,6 +18,7 @@ import (
 	"time"
 )
 
+// Name consts need explanation, TODO
 const (
 	Name    = "MemGator"
 	Version = "1.0-rc4"
@@ -54,10 +55,12 @@ var contimeout = flag.Duration([]string{"t", "-contimeout"}, time.Duration(5*tim
 var hdrtimeout = flag.Duration([]string{"T", "-hdrtimeout"}, time.Duration(15*time.Second), "Header timeout for each archive")
 var restimeout = flag.Duration([]string{"r", "-restimeout"}, time.Duration(20*time.Second), "Response timeout for each archive")
 
+// Session struct needs explanation, TODO
 type Session struct {
 	Start time.Time
 }
 
+// Archive struct needs explanation, TODO
 type Archive struct {
 	ID          string  `json:"id"`
 	Name        string  `json:"name"`
@@ -67,6 +70,7 @@ type Archive struct {
 	Ignore      bool    `json:"ignore"`
 }
 
+// Archives struct needs explanation, TODO
 type Archives []Archive
 
 func (a Archives) Len() int {
@@ -94,6 +98,7 @@ func (a *Archives) filterIgnored() {
 
 var archives Archives
 
+// Link struct needs explanation, TODO
 type Link struct {
 	Href     string
 	Datetime string
@@ -309,9 +314,9 @@ func serializeLinks(urir string, basetm *list.List, format string, dataCh chan s
 		if !navonly {
 			dataCh <- fmt.Sprintf(`  "self": "%s/json/%s",`+"\n", *mapbase, urir)
 		}
-		dataCh <- fmt.Sprintf(`  "mementos": {`+"\n")
+		dataCh <- fmt.Sprintf(`  "mementos": {` + "\n")
 		if !navonly {
-			dataCh <- `    "list": [`+"\n"
+			dataCh <- `    "list": [` + "\n"
 		}
 		navs := ""
 		for e := basetm.Front(); e != nil; e = e.Next() {
@@ -335,17 +340,17 @@ func serializeLinks(urir string, basetm *list.List, format string, dataCh chan s
 			dataCh <- "\n    ],\n"
 		}
 		dataCh <- strings.TrimRight(navs, ",\n")
-		dataCh <- fmt.Sprintf("\n  },\n"+`  "timemap_uri": {`+"\n")
+		dataCh <- fmt.Sprintf("\n  },\n" + `  "timemap_uri": {` + "\n")
 		dataCh <- fmt.Sprintf(`    "link_format": "%s/link/%s",`+"\n", *mapbase, urir)
 		dataCh <- fmt.Sprintf(`    "json_format": "%s/json/%s",`+"\n", *mapbase, urir)
 		dataCh <- fmt.Sprintf(`    "cdxj_format": "%s/cdxj/%s"`+"\n  },\n", *mapbase, urir)
 		dataCh <- fmt.Sprintf(`  "timegate_uri": "%s/%s"`+"\n}\n", *gatebase, urir)
 	case "cdxj":
-		dataCh <- fmt.Sprintf(`@context ["http://tools.ietf.org/html/rfc7089"]`+"\n")
+		dataCh <- fmt.Sprintf(`@context ["http://tools.ietf.org/html/rfc7089"]` + "\n")
 		if !navonly {
 			dataCh <- fmt.Sprintf(`@id {"uri": "%s/cdxj/%s"}`+"\n", *mapbase, urir)
 		}
-		dataCh <- fmt.Sprintf(`@keys ["memento_datetime_YYYYMMDDhhmmss"]`+"\n")
+		dataCh <- fmt.Sprintf(`@keys ["memento_datetime_YYYYMMDDhhmmss"]` + "\n")
 		dataCh <- fmt.Sprintf(`@meta {"original_uri": "%s"}`+"\n", urir)
 		dataCh <- fmt.Sprintf(`@meta {"timegate_uri": "%s/%s"}`+"\n", *gatebase, urir)
 		dataCh <- fmt.Sprintf(`@meta {"timemap_uri": {"link_format": "%s/link/%s", "json_format": "%s/json/%s", "cdxj_format": "%s/cdxj/%s"}`+"\n", *mapbase, urir, *mapbase, urir, *mapbase, urir)
