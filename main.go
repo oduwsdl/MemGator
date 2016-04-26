@@ -122,8 +122,7 @@ var regs = map[string]*regexp.Regexp{
 	"dttmstr": regexp.MustCompile(`^(\d{4})(\d{2})?(\d{2})?(\d{2})?(\d{2})?(\d{2})?$`),
 	"tmappth": regexp.MustCompile(`^timemap/(link|json|cdxj)/.+`),
 	"tgatpth": regexp.MustCompile(`^timegate/.+`),
-	"tnavpth": regexp.MustCompile(`^timenav/(link|json|cdxj)/(\d{4})(\d{2})?(\d{2})?(\d{2})?(\d{2})?(\d{2})?/.+`),
-	"rdrcpth": regexp.MustCompile(`^redirect/(\d{4})(\d{2})?(\d{2})?(\d{2})?(\d{2})?(\d{2})?/.+`),
+	"memtpth": regexp.MustCompile(`^memento/(redirect|link|json|cdxj)/(\d{4})(\d{2})?(\d{2})?(\d{2})?(\d{2})?(\d{2})?/.+`),
 }
 
 func dialTimeout(network, addr string) (net.Conn, error) {
@@ -544,12 +543,8 @@ func memgatorService(w http.ResponseWriter, r *http.Request, urir string, format
 		return
 	}
 	navonly, closest := setNavRels(basetm, dttmp, sess)
-	if format == "redirect" {
-		http.Redirect(w, r, closest, http.StatusFound)
-		return
-	}
 	dataCh := make(chan string, 1)
-	if format == "timegate" {
+	if format == "timegate" || format == "redirect" {
 		go serializeLinks(urir, basetm, "link", dataCh, navonly, sess)
 		lnkhdr := ""
 		for dt := range dataCh {
@@ -557,7 +552,9 @@ func memgatorService(w http.ResponseWriter, r *http.Request, urir string, format
 		}
 		lnkhdr = strings.Replace(lnkhdr, "\n", " ", -1)
 		w.Header().Set("Link", lnkhdr)
-		w.Header().Set("Vary", "accept-datetime")
+		if format == "timegate" {
+			w.Header().Set("Vary", "accept-datetime")
+		}
 		http.Redirect(w, r, closest, http.StatusFound)
 		return
 	}
@@ -591,23 +588,14 @@ func router(w http.ResponseWriter, r *http.Request) {
 		} else {
 			err = fmt.Errorf("/timemap/link|json|cdxj/{URI-R}")
 		}
-	case "timenav":
-		if regs["tnavpth"].MatchString(requri) {
+	case "memento":
+		if regs["memtpth"].MatchString(requri) {
 			p := strings.SplitN(requri, "/", 4)
 			format = p[1]
 			rawdtm = p[2]
 			rawuri = p[3]
 		} else {
-			err = fmt.Errorf("/timenav/link|json|cdxj/{YYYY[MM[DD[hh[mm[ss]]]]]}/{URI-R}")
-		}
-	case "redirect":
-		if regs["rdrcpth"].MatchString(requri) {
-			p := strings.SplitN(requri, "/", 3)
-			format = p[0]
-			rawdtm = p[1]
-			rawuri = p[2]
-		} else {
-			err = fmt.Errorf("/redirect/{YYYY[MM[DD[hh[mm[ss]]]]]}/{URI-R}")
+			err = fmt.Errorf("/memento/redirect|link|json|cdxj/{YYYY[MM[DD[hh[mm[ss]]]]]}/{URI-R}")
 		}
 	case "timegate":
 		if regs["tgatpth"].MatchString(requri) {
@@ -673,7 +661,7 @@ func overrideFlags() {
 }
 
 func serviceInfo() (msg string) {
-	return fmt.Sprintf("TimeMap  : %s/link|json|cdxj/{URI-R}\nTimeGate : %s/{URI-R} [Accept-Datetime]\nTimeNav  : %s/timenav/link|json|cdxj/{YYYY[MM[DD[hh[mm[ss]]]]]}/{URI-R}\nRedirect : %s/redirect/{YYYY[MM[DD[hh[mm[ss]]]]]}/{URI-R}\n", *mapbase, *gatebase, *servicebase, *servicebase)
+	return fmt.Sprintf("TimeMap             : %s/link|json|cdxj/{URI-R}\nTimeGate            : %s/{URI-R} [Accept-Datetime Header]\nMemento Description : %s/memento/link|json|cdxj/{YYYY[MM[DD[hh[mm[ss]]]]]}/{URI-R}\nMemento Redirect    : %s/memento/redirect/{YYYY[MM[DD[hh[mm[ss]]]]]}/{URI-R}\n", *mapbase, *gatebase, *servicebase, *servicebase)
 }
 
 func appInfo() (msg string) {
@@ -684,7 +672,7 @@ func usage() {
 	fmt.Fprintf(os.Stderr, appInfo())
 	fmt.Fprintf(os.Stderr, "Usage:\n")
 	fmt.Fprintf(os.Stderr, "  %s [options] {URI-R}                                # TimeMap CLI\n", os.Args[0])
-	fmt.Fprintf(os.Stderr, "  %s [options] {URI-R} {YYYY[MM[DD[hh[mm[ss]]]]]}     # TimeGate CLI\n", os.Args[0])
+	fmt.Fprintf(os.Stderr, "  %s [options] {URI-R} {YYYY[MM[DD[hh[mm[ss]]]]]}     # Memento Description CLI\n", os.Args[0])
 	fmt.Fprintf(os.Stderr, "  %s [options] server                                 # Run as a Web Service\n", os.Args[0])
 	fmt.Fprintf(os.Stderr, "\nOptions:\n")
 	flag.PrintDefaults()
