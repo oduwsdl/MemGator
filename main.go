@@ -54,8 +54,8 @@ var topk = flag.Int([]string{"k", "-topk"}, -1, "Aggregate only top k archives b
 var verbose = flag.Bool([]string{"V", "-verbose"}, false, "Show Info and Profiling messages on STDERR")
 var version = flag.Bool([]string{"v", "-version"}, false, "Show name and version")
 var contimeout = flag.Duration([]string{"t", "-contimeout"}, time.Duration(5*time.Second), "Connection timeout for each archive")
-var hdrtimeout = flag.Duration([]string{"T", "-hdrtimeout"}, time.Duration(15*time.Second), "Header timeout for each archive")
-var restimeout = flag.Duration([]string{"r", "-restimeout"}, time.Duration(20*time.Second), "Response timeout for each archive")
+var hdrtimeout = flag.Duration([]string{"T", "-hdrtimeout"}, time.Duration(30*time.Second), "Header timeout for each archive")
+var restimeout = flag.Duration([]string{"r", "-restimeout"}, time.Duration(60*time.Second), "Response timeout for each archive")
 
 // Session struct needs explanation, TODO
 type Session struct {
