@@ -35,6 +35,8 @@ var (
 	logProfile *log.Logger
 	logInfo    *log.Logger
 	logError   *log.Logger
+	transport  http.Transport
+	client     http.Client
 )
 
 var format = flag.String([]string{"f", "-format"}, "Link", "Output format - Link/JSON/CDXJ")
@@ -124,20 +126,6 @@ var regs = map[string]*regexp.Regexp{
 	"tgatpth": regexp.MustCompile(`^timegate/.+`),
 	"tnavpth": regexp.MustCompile(`^timenav/(link|json|cdxj)/(\d{4})(\d{2})?(\d{2})?(\d{2})?(\d{2})?(\d{2})?/.+`),
 	"rdrcpth": regexp.MustCompile(`^redirect/(\d{4})(\d{2})?(\d{2})?(\d{2})?(\d{2})?(\d{2})?/.+`),
-}
-
-func dialTimeout(network, addr string) (net.Conn, error) {
-	return net.DialTimeout(network, addr, *contimeout)
-}
-
-var transport = http.Transport{
-	Dial: dialTimeout,
-	ResponseHeaderTimeout: *hdrtimeout,
-}
-
-var client = http.Client{
-	Transport: &transport,
-	Timeout:   *restimeout,
 }
 
 func readArchives() (body []byte, err error) {
@@ -723,6 +711,20 @@ func initLoggers() {
 	logProfile = log.New(profileHandle, "PROFILE: ", log.Ldate|log.Lmicroseconds)
 }
 
+func initNetwork()  {
+	transport = http.Transport{
+		Dial: (&net.Dialer{
+			Timeout:   *contimeout,
+			KeepAlive: *restimeout,
+		}).Dial,
+		ResponseHeaderTimeout: *hdrtimeout,
+	}
+	client = http.Client{
+		Transport: &transport,
+		Timeout:   *restimeout,
+	}
+}
+
 func main() {
 	start := time.Now()
 	flag.Usage = usage
@@ -738,6 +740,7 @@ func main() {
 		os.Exit(1)
 	}
 	initLoggers()
+	initNetwork()
 	logInfo.Printf("Initializing %s:%s...", Name, Version)
 	logInfo.Printf("Loading archives from %s", *arcsloc)
 	body, err := readArchives()
