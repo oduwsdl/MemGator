@@ -7,6 +7,7 @@ import (
 	flag "github.com/oduwsdl/memgator/pkg/mflag"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"net"
 	"net/http"
 	"net/url"
@@ -54,6 +55,7 @@ var topk = flag.Int([]string{"k", "-topk"}, -1, "Aggregate only top k archives b
 var tolerance = flag.Int([]string{"F", "-tolerance"}, -1, "Failure tolerance limit for each archive")
 var verbose = flag.Bool([]string{"V", "-verbose"}, false, "Show Info and Profiling messages on STDERR")
 var version = flag.Bool([]string{"v", "-version"}, false, "Show name and version")
+var spoof = flag.Bool([]string{"S", "-spoof"}, false, "Spoof each request with a random user-agent")
 var contimeout = flag.Duration([]string{"t", "-contimeout"}, time.Duration(5*time.Second), "Connection timeout for each archive")
 var hdrtimeout = flag.Duration([]string{"T", "-hdrtimeout"}, time.Duration(30*time.Second), "Header timeout for each archive")
 var restimeout = flag.Duration([]string{"r", "-restimeout"}, time.Duration(60*time.Second), "Response timeout for each archive")
@@ -130,6 +132,12 @@ var regs = map[string]*regexp.Regexp{
 	"tgatpth": regexp.MustCompile(`^timegate/.+`),
 	"tnavpth": regexp.MustCompile(`^timenav/(link|json|cdxj)/(\d{4})(\d{2})?(\d{2})?(\d{2})?(\d{2})?(\d{2})?/.+`),
 	"rdrcpth": regexp.MustCompile(`^redirect/(\d{4})(\d{2})?(\d{2})?(\d{2})?(\d{2})?(\d{2})?/.+`),
+}
+
+var spoofAgents = []string{
+	"Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.112 Safari/537.36",
+	"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_4) AppleWebKit/601.5.17 (KHTML, like Gecko) Version/9.1 Safari/601.5.17",
+	"Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:45.0) Gecko/20100101 Firefox/45.0",
 }
 
 func readArchives() (body []byte, err error) {
@@ -234,7 +242,11 @@ func fetchTimemap(urir string, arch *Archive, tmCh chan *list.List, wg *sync.Wai
 		logError.Printf("%s => Request error: %v", arch.ID, err)
 		return
 	}
-	req.Header.Add("User-Agent", *agent)
+	if *spoof {
+		req.Header.Add("User-Agent", spoofAgents[rand.Intn(len(spoofAgents))])
+	} else {
+		req.Header.Add("User-Agent", *agent)
+	}
 	var res *http.Response
 	if dttmp == nil {
 		res, err = client.Do(req)
