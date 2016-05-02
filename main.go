@@ -243,6 +243,7 @@ func fetchTimemap(urir string, arch *Archive, tmCh chan *list.List, wg *sync.Wai
 		return
 	}
 	if *spoof {
+		rand.Seed(time.Now().Unix())
 		req.Header.Add("User-Agent", spoofAgents[rand.Intn(len(spoofAgents))])
 	} else {
 		req.Header.Add("User-Agent", *agent)
