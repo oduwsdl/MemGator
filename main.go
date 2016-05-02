@@ -51,11 +51,13 @@ var mapbase = flag.String([]string{"m", "-timemap"}, "http://{SERVICE}/timemap",
 var gatebase = flag.String([]string{"g", "-timegate"}, "http://{SERVICE}/timegate", "TimeGate base URL - default based on service URL")
 var port = flag.Int([]string{"p", "-port"}, 1208, "Port number - only used in web service mode")
 var topk = flag.Int([]string{"k", "-topk"}, -1, "Aggregate only top k archives based on probability")
+var tolerance = flag.Int([]string{"F", "-tolerance"}, -1, "Failure tolerance limit for each archive")
 var verbose = flag.Bool([]string{"V", "-verbose"}, false, "Show Info and Profiling messages on STDERR")
 var version = flag.Bool([]string{"v", "-version"}, false, "Show name and version")
 var contimeout = flag.Duration([]string{"t", "-contimeout"}, time.Duration(5*time.Second), "Connection timeout for each archive")
 var hdrtimeout = flag.Duration([]string{"T", "-hdrtimeout"}, time.Duration(30*time.Second), "Header timeout for each archive")
 var restimeout = flag.Duration([]string{"r", "-restimeout"}, time.Duration(60*time.Second), "Response timeout for each archive")
+var dormant = flag.Duration([]string{"d", "-dormant"}, time.Duration(15*time.Minute), "Dormant period after consecutive failures")
 
 // Session struct needs explanation, TODO
 type Session struct {
@@ -70,6 +72,8 @@ type Archive struct {
 	Timegate    string  `json:"timegate"`
 	Probability float64 `json:"probability"`
 	Ignore      bool    `json:"ignore"`
+	Dormant     bool    `json:"-"`
+	Failures    int     `json:"-"`
 }
 
 // Archives struct needs explanation, TODO
@@ -217,7 +221,7 @@ func extractMementos(lnksplt chan string) (tml *list.List) {
 	return
 }
 
-func fetchTimemap(urir string, arch Archive, tmCh chan *list.List, wg *sync.WaitGroup, dttmp *time.Time, sess *Session) {
+func fetchTimemap(urir string, arch *Archive, tmCh chan *list.List, wg *sync.WaitGroup, dttmp *time.Time, sess *Session) {
 	start := time.Now()
 	defer wg.Done()
 	url := arch.Timemap + urir
@@ -241,8 +245,20 @@ func fetchTimemap(urir string, arch Archive, tmCh chan *list.List, wg *sync.Wait
 	if err != nil {
 		profileTime(arch.ID, "timemapfetch", fmt.Sprintf("Network error in %s", arch.Name), start, sess)
 		logError.Printf("%s => Network error: %v", arch.ID, err)
+		arch.Failures++
+		if arch.Failures == *tolerance {
+			arch.Dormant = true
+			logInfo.Printf("%s => Dormant after %d consecutive failures", arch.ID, arch.Failures)
+			go func (arch *Archive)  {
+				time.Sleep(*dormant)
+				arch.Dormant = false
+				arch.Failures = 0
+				logInfo.Printf("%s => Awake after %s", arch.ID, *dormant)
+			}(arch)
+		}
 		return
 	}
+	arch.Failures = 0
 	defer res.Body.Close()
 	if res.StatusCode != http.StatusOK && res.StatusCode != http.StatusFound {
 		profileTime(arch.ID, "timemapfetch", fmt.Sprintf("Response error in %s, Stutus: %d", arch.Name, res.StatusCode), start, sess)
@@ -365,8 +381,11 @@ func aggregateTimemap(urir string, dttmp *time.Time, sess *Session) (basetm *lis
 		if i == *topk {
 			break
 		}
+		if arch.Dormant {
+			continue
+		}
 		wg.Add(1)
-		go fetchTimemap(urir, arch, tmCh, &wg, dttmp, sess)
+		go fetchTimemap(urir, &archives[i], tmCh, &wg, dttmp, sess)
 	}
 	go func() {
 		wg.Wait()
