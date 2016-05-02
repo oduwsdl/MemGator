@@ -104,6 +104,17 @@ func (a *Archives) filterIgnored() {
 	(*a) = (*a)[:filterPos:filterPos]
 }
 
+func (a *Archives) sanitize() {
+	for i := range *a {
+		if !strings.HasSuffix((*a)[i].Timemap, "/") {
+			(*a)[i].Timemap += "/"
+		}
+		if !strings.HasSuffix((*a)[i].Timegate, "/") {
+			(*a)[i].Timegate += "/"
+		}
+	}
+}
+
 var archives Archives
 
 // Link struct needs explanation, TODO
@@ -781,6 +792,7 @@ func main() {
 		os.Exit(1)
 	}
 	err = json.Unmarshal(body, &archives)
+	archives.sanitize()
 	archives.filterIgnored()
 	sort.Sort(archives)
 	if err != nil {
