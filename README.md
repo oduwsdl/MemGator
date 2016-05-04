@@ -15,7 +15,8 @@ A Memento Aggregator CLI and Server in [Go](https://golang.org/).
 * Three levels of customizable timeouts for greater control over remote requests
 * Customizable logging and profiling in CDXJ format
 * Customizable endpoint URLs - helpful in load-balancing
-* Customizable User-Agent to be sent to each archive
+* Customizable User-Agent to be sent to each archive and User-Agent spoofing
+* Configurable archive failure detection and automatic hibernation
 * [CORS](http://www.w3.org/TR/cors/) support to make it easy to use it from JavaScript clients
 * Memento count exposed in the header that can be retrieved via `HEAD` request
 * [Docker](https://www.docker.com/) friendly - An image available as [ibnesayeed/memgator](https://hub.docker.com/r/ibnesayeed/memgator/)
@@ -34,7 +35,7 @@ $ memgator [options] {URI-R} {YYYY[MM[DD[hh[mm[ss]]]]]} # TimeGate CLI
 
 ### Server
 
-When run as a Web Service, MemGator exposes three customizable endpoints as follows:
+When run as a Web Service, MemGator exposes four customizable endpoints as follows:
 
 ```
 $ memgator [options] server
@@ -78,9 +79,11 @@ Usage:
   memgator [options] server                                   # Run as a Web Service
 
 Options:
-  -A, --agent=MemGator:1.0-beta <{CONTACT}>                   User-agent string sent to archives
+  -A, --agent=MemGator:{Version} <{CONTACT}>                  User-agent string sent to archives
   -a, --arcs=http://oduwsdl.github.io/memgator/archives.json  Local/remote JSON file path/URL for list of archives
   -c, --contact=@WebSciDL                                     Email/URL/Twitter handle - Used in the user-agent
+  -d, --dormant=15m0s                                         Dormant period after consecutive failures
+  -F, --tolerance=-1                                          Failure tolerance limit for each archive
   -f, --format=Link                                           Output format - Link/JSON/CDXJ
   -g, --timegate=http://{SERVICE}/timegate                    TimeGate base URL - default based on service URL
   -H, --host=localhost                                        Host name - only used in web service mode
@@ -89,11 +92,12 @@ Options:
   -m, --timemap=http://{SERVICE}/timemap                      TimeMap base URL - default based on service URL
   -P, --profile=                                              Profile file location - Defaults to Logfile
   -p, --port=1208                                             Port number - only used in web service mode
-  -r, --restimeout=20s                                        Response timeout for each archive
+  -r, --restimeout=1m0s                                       Response timeout for each archive
+  -S, --spoof=false                                           Spoof each request with a random user-agent
   -s, --service=http://{HOST}[:{PORT}]                        Service base URL - default based on host & port
-  -T, --hdrtimeout=15s                                        Header timeout for each archive
+  -T, --hdrtimeout=30s                                        Header timeout for each archive
   -t, --contimeout=5s                                         Connection timeout for each archive
-  -V, --verbose=false                                         Show Info and Profiling messages on STDERR
+  -V, --verbose=false                                         Show Log and Profiling messages on STDERR
   -v, --version=false                                         Show name and version
 ```
 
