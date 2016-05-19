@@ -36,6 +36,7 @@ var (
 	logProfile *log.Logger
 	logInfo    *log.Logger
 	logError   *log.Logger
+	logFatal   *log.Logger
 	transport  http.Transport
 	client     http.Client
 )
@@ -455,11 +456,9 @@ func parseURI(uri string) (urir string, err error) {
 		uri = "http://" + uri
 	}
 	u, err := url.Parse(uri)
-	if err != nil {
-		logError.Printf("URI parsing error (%s): %v", uri, err)
-		return
+	if err == nil {
+		urir = u.String()
 	}
-	urir = u.String()
 	return
 }
 
@@ -473,9 +472,6 @@ func paddedTime(dttmstr string) (dttm *time.Time, err error) {
 	dts += (m[6] + "00")[:2]
 	var dtm time.Time
 	dtm, err = time.Parse("20060102150405", dts)
-	if err != nil {
-		logError.Printf("Time parsing error (%s): %v", dttmstr, err)
-	}
 	dttm = &dtm
 	return
 }
@@ -671,12 +667,14 @@ func router(w http.ResponseWriter, r *http.Request) {
 	}
 	urir, err = parseURI(rawuri)
 	if err != nil {
+		logError.Printf("URI parsing error (%s): %v", rawuri, err)
 		http.Error(w, "Malformed URI-R: "+rawuri, http.StatusBadRequest)
 		return
 	}
 	if rawdtm != "" {
 		dttm, err = paddedTime(rawdtm)
 		if err != nil {
+			logError.Printf("Time parsing error (%s): %v", rawdtm, err)
 			http.Error(w, "Malformed datetime: "+rawdtm+"\nExpected format: YYYY[MM[DD[hh[mm[ss]]]]]", http.StatusBadRequest)
 			return
 		}
@@ -723,14 +721,14 @@ func usage() {
 }
 
 func initLoggers() {
+	logFatal = log.New(os.Stderr, "FATAL: ", log.Lshortfile)
 	errorHandle := os.Stderr
 	infoHandle := ioutil.Discard
 	profileHandle := ioutil.Discard
 	if *logfile != "" {
 		lgf, err := os.OpenFile(*logfile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error opening log file (%s): %v\n", *logfile, err)
-			os.Exit(1)
+			logFatal.Fatalf("Error opening log file (%s): %v\n", *logfile, err)
 		}
 		errorHandle = lgf
 		infoHandle = lgf
@@ -739,8 +737,7 @@ func initLoggers() {
 	if *profile != "" {
 		prf, err := os.OpenFile(*profile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error opening profile file (%s): %v\n", *profile, err)
-			os.Exit(1)
+			logFatal.Fatalf("Error opening profile file (%s): %v\n", *profile, err)
 		}
 		profileHandle = prf
 	}
@@ -788,16 +785,14 @@ func main() {
 	logInfo.Printf("Loading archives from %s", *arcsloc)
 	body, err := readArchives()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error reading list of archives (%s): %s\n", *arcsloc, err)
-		os.Exit(1)
+		logFatal.Fatalf("Error reading list of archives (%s): %s\n", *arcsloc, err)
 	}
 	err = json.Unmarshal(body, &archives)
 	archives.sanitize()
 	archives.filterIgnored()
 	sort.Sort(archives)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error parsing JSON (%s): %s\n", *arcsloc, err)
-		os.Exit(1)
+		logFatal.Fatalf("Error parsing JSON (%s): %s\n", *arcsloc, err)
 	}
 	if target == "server" {
 		fmt.Printf(appInfo())
@@ -806,24 +801,22 @@ func main() {
 		http.HandleFunc("/", welcome)
 		err = http.ListenAndServe(addr, http.HandlerFunc(router))
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "Error listening: %s\n", err)
-			os.Exit(1)
+			logFatal.Fatalf("Error listening: %s\n", err)
 		}
 	} else {
 		urir, err := parseURI(target)
 		if err != nil {
-			os.Exit(1)
+			logFatal.Fatalf("URI parsing error (%s): %v\n", rawuri, err)
 		}
 		var dttm *time.Time
 		if rawdtm := flag.Arg(1); rawdtm != "" {
 			if regs["dttmstr"].MatchString(rawdtm) {
 				dttm, err = paddedTime(rawdtm)
 				if err != nil {
-					os.Exit(1)
+					logFatal.Fatalf("Time parsing error (%s): %v\n", rawdtm, err)
 				}
 			} else {
-				logError.Printf("Malformed datetime {YYYY[MM[DD[hh[mm[ss]]]]]}: %s", rawdtm)
-				os.Exit(1)
+				logFatal.Fatalf("Malformed datetime {YYYY[MM[DD[hh[mm[ss]]]]]}: %s\n", rawdtm)
 			}
 		}
 		memgatorCli(urir, *format, dttm)
