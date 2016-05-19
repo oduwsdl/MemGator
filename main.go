@@ -804,7 +804,7 @@ func main() {
 		fmt.Printf(serviceInfo())
 		addr := fmt.Sprintf(":%d", *port)
 		http.HandleFunc("/", welcome)
-		http.ListenAndServe(addr, http.HandlerFunc(router))
+		log.Fatal(http.ListenAndServe(addr, http.HandlerFunc(router)))
 	} else {
 		urir, err := parseURI(target)
 		if err != nil {
