@@ -806,7 +806,7 @@ func main() {
 	} else {
 		urir, err := parseURI(target)
 		if err != nil {
-			logFatal.Fatalf("URI parsing error (%s): %v\n", rawuri, err)
+			logFatal.Fatalf("URI parsing error (%s): %v\n", target, err)
 		}
 		var dttm *time.Time
 		if rawdtm := flag.Arg(1); rawdtm != "" {
