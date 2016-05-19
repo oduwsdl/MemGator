@@ -273,7 +273,7 @@ func fetchTimemap(urir string, arch *Archive, tmCh chan *list.List, wg *sync.Wai
 		if arch.Failures == *tolerance {
 			arch.Dormant = true
 			logInfo.Printf("%s => Dormant after %d consecutive failures", arch.ID, arch.Failures)
-			go func (arch *Archive)  {
+			go func(arch *Archive) {
 				time.Sleep(*dormant)
 				arch.Dormant = false
 				arch.Failures = 0
@@ -391,7 +391,7 @@ func serializeLinks(urir string, basetm *list.List, format string, dataCh chan s
 			if lnk.NavRels != nil {
 				rels = strings.Join(lnk.NavRels, " ") + " " + rels
 			}
-			dataCh <- fmt.Sprintf(`%s {"uri": "%s", "rel"="%s", "datetime"="%s"}`+"\n", lnk.Timestr, lnk.Href, rels, lnk.Datetime)
+			dataCh <- fmt.Sprintf(`%s {"uri": "%s", "rel": "%s", "datetime": "%s"}`+"\n", lnk.Timestr, lnk.Href, rels, lnk.Datetime)
 		}
 	default:
 		dataCh <- fmt.Sprintf("Unrecognized format: %s\n", format)
@@ -754,7 +754,7 @@ func initLoggers() {
 	logProfile = log.New(profileHandle, "PROFILE: ", log.Ldate|log.Lmicroseconds)
 }
 
-func initNetwork()  {
+func initNetwork() {
 	transport = http.Transport{
 		Dial: (&net.Dialer{
 			Timeout:   *contimeout,
