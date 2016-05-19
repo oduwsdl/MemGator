@@ -391,7 +391,7 @@ func serializeLinks(urir string, basetm *list.List, format string, dataCh chan s
 			if lnk.NavRels != nil {
 				rels = strings.Join(lnk.NavRels, " ") + " " + rels
 			}
-			dataCh <- fmt.Sprintf(`%s {"uri": "%s", "rel"="%s", "datetime"="%s"}`+"\n", lnk.Timestr, lnk.Href, rels, lnk.Datetime)
+			dataCh <- fmt.Sprintf(`%s {"uri": "%s", "rel":"%s", "datetime":"%s"}`+"\n", lnk.Timestr, lnk.Href, rels, lnk.Datetime)
 		}
 	default:
 		dataCh <- fmt.Sprintf("Unrecognized format: %s\n", format)
