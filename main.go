@@ -560,7 +560,6 @@ func memgatorService(w http.ResponseWriter, r *http.Request, urir string, format
 	basetm := aggregateTimemap(urir, dttmp, sess)
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Expose-Headers", "Link, Location, X-Memento-Count, X-Generator")
-	w.Header().Set("X-Generator", Name+":"+Version)
 	if dttmp == nil {
 		w.Header().Set("X-Memento-Count", fmt.Sprintf("%d", basetm.Len()))
 	}
@@ -597,14 +596,11 @@ func memgatorService(w http.ResponseWriter, r *http.Request, urir string, format
 	logInfo.Printf("Total Mementos: %d in %s", basetm.Len(), time.Since(start))
 }
 
-func welcome(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, serviceInfo())
-}
-
 func router(w http.ResponseWriter, r *http.Request) {
 	var format, urir, rawuri, rawdtm string
 	var dttm *time.Time
 	var err error
+	w.Header().Set("X-Generator", Name+":"+Version)
 	requri := r.URL.RequestURI()[1:]
 	endpoint := strings.SplitN(requri, "/", 2)[0]
 	switch endpoint {
@@ -652,9 +648,11 @@ func router(w http.ResponseWriter, r *http.Request) {
 		} else {
 			err = fmt.Errorf("/timegate/{URI-R}")
 		}
+	case "":
+		fmt.Fprint(w, serviceInfo())
+		return
 	default:
 		logInfo.Printf("Delegated to default ServerMux: %s", r.URL.RequestURI())
-		w.Header().Set("X-Generator", Name+":"+Version)
 		http.DefaultServeMux.ServeHTTP(w, r)
 		return
 	}
@@ -790,7 +788,6 @@ func main() {
 		fmt.Printf(appInfo())
 		fmt.Printf(serviceInfo())
 		addr := fmt.Sprintf(":%d", *port)
-		http.HandleFunc("/", welcome)
 		err = http.ListenAndServe(addr, http.HandlerFunc(router))
 		if err != nil {
 			logFatal.Fatalf("Error listening: %s\n", err)
