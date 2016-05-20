@@ -34,19 +34,19 @@ const (
 )
 
 var (
-	logProfile *log.Logger
-	logInfo    *log.Logger
-	logError   *log.Logger
-	logFatal   *log.Logger
-	transport  http.Transport
-	client     http.Client
-	broker     *sse.Broker
+	logBenchmark *log.Logger
+	logInfo      *log.Logger
+	logError     *log.Logger
+	logFatal     *log.Logger
+	transport    http.Transport
+	client       http.Client
+	broker       *sse.Broker
 )
 
 var format = flag.String([]string{"f", "-format"}, "Link", "Output format - Link/JSON/CDXJ")
 var arcsloc = flag.String([]string{"a", "-arcs"}, "http://oduwsdl.github.io/memgator/archives.json", "Local/remote JSON file path/URL for list of archives")
 var logfile = flag.String([]string{"l", "-log"}, "", "Log file location - Defaults to STDERR")
-var profile = flag.String([]string{"P", "-profile"}, "", "Profile file location - Defaults to Logfile")
+var benchmark = flag.String([]string{"b", "-benchmark", "#P", "#-profile"}, "", "Benchmark file location - Defaults to Logfile")
 var contact = flag.String([]string{"c", "-contact"}, "@WebSciDL", "Email/URL/Twitter handle - Used in the user-agent")
 var agent = flag.String([]string{"A", "-agent"}, fmt.Sprintf("%s:%s <{CONTACT}>", Name, Version), "User-agent string sent to archives")
 var host = flag.String([]string{"H", "-host"}, "localhost", "Host name - only used in web service mode")
@@ -251,7 +251,7 @@ func fetchTimemap(urir string, arch *Archive, tmCh chan *list.List, wg *sync.Wai
 	}
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		profileTime(arch.ID, "timemapfetch", fmt.Sprintf("Request error in %s", arch.Name), start, sess)
+		benchmarker(arch.ID, "timemapfetch", fmt.Sprintf("Request error in %s", arch.Name), start, sess)
 		logError.Printf("%s => Request error: %v", arch.ID, err)
 		return
 	}
@@ -269,7 +269,7 @@ func fetchTimemap(urir string, arch *Archive, tmCh chan *list.List, wg *sync.Wai
 		res, err = transport.RoundTrip(req)
 	}
 	if err != nil {
-		profileTime(arch.ID, "timemapfetch", fmt.Sprintf("Network error in %s", arch.Name), start, sess)
+		benchmarker(arch.ID, "timemapfetch", fmt.Sprintf("Network error in %s", arch.Name), start, sess)
 		logError.Printf("%s => Network error: %v", arch.ID, err)
 		arch.Failures++
 		if arch.Failures == *tolerance {
@@ -287,7 +287,7 @@ func fetchTimemap(urir string, arch *Archive, tmCh chan *list.List, wg *sync.Wai
 	arch.Failures = 0
 	defer res.Body.Close()
 	if res.StatusCode != http.StatusOK && res.StatusCode != http.StatusFound {
-		profileTime(arch.ID, "timemapfetch", fmt.Sprintf("Response error in %s, Stutus: %d", arch.Name, res.StatusCode), start, sess)
+		benchmarker(arch.ID, "timemapfetch", fmt.Sprintf("Response error in %s, Stutus: %d", arch.Name, res.StatusCode), start, sess)
 		logInfo.Printf("%s => Response error: %s", arch.ID, res.Status)
 		return
 	}
@@ -295,13 +295,13 @@ func fetchTimemap(urir string, arch *Archive, tmCh chan *list.List, wg *sync.Wai
 	if dttmp == nil {
 		body, err := ioutil.ReadAll(res.Body)
 		if err != nil {
-			profileTime(arch.ID, "timemapfetch", fmt.Sprintf("Response read error in %s", arch.Name), start, sess)
+			benchmarker(arch.ID, "timemapfetch", fmt.Sprintf("Response read error in %s", arch.Name), start, sess)
 			logError.Printf("%s => Response read error: %v", arch.ID, err)
 			return
 		}
 		lnks = string(body)
 	}
-	profileTime(arch.ID, "timemapfetch", fmt.Sprintf("TimeMap fethched from %s", arch.Name), start, sess)
+	benchmarker(arch.ID, "timemapfetch", fmt.Sprintf("TimeMap fethched from %s", arch.Name), start, sess)
 	start = time.Now()
 	lnkrcvd := make(chan string, 1)
 	lnksplt := make(chan string, 128)
@@ -309,13 +309,13 @@ func fetchTimemap(urir string, arch *Archive, tmCh chan *list.List, wg *sync.Wai
 	go splitLinks(lnkrcvd, lnksplt)
 	tml := extractMementos(lnksplt)
 	tmCh <- tml
-	profileTime(arch.ID, "extractmementos", fmt.Sprintf("%d Mementos extracted from %s", tml.Len(), arch.Name), start, sess)
+	benchmarker(arch.ID, "extractmementos", fmt.Sprintf("%d Mementos extracted from %s", tml.Len(), arch.Name), start, sess)
 	logInfo.Printf("%s => Success: %d mementos", arch.ID, tml.Len())
 }
 
 func serializeLinks(urir string, basetm *list.List, format string, dataCh chan string, navonly bool, sess *Session) {
 	start := time.Now()
-	defer profileTime("AGGREGATOR", "serialize", fmt.Sprintf("%d mementos serialized", basetm.Len()), start, sess)
+	defer benchmarker("AGGREGATOR", "serialize", fmt.Sprintf("%d mementos serialized", basetm.Len()), start, sess)
 	defer close(dataCh)
 	switch strings.ToLower(format) {
 	case "link":
@@ -447,7 +447,7 @@ func aggregateTimemap(urir string, dttmp *time.Time, sess *Session) (basetm *lis
 				}
 			}
 		}
-		profileTime("AGGREGATOR", "aggregate", fmt.Sprintf("%d Mementos accumulated and sorted", basetm.Len()), start, sess)
+		benchmarker("AGGREGATOR", "aggregate", fmt.Sprintf("%d Mementos accumulated and sorted", basetm.Len()), start, sess)
 	}
 	return
 }
@@ -477,11 +477,11 @@ func paddedTime(dttmstr string) (dttm *time.Time, err error) {
 	return
 }
 
-func profileTime(origin string, role string, info string, start time.Time, sess *Session) {
+func benchmarker(origin string, role string, info string, start time.Time, sess *Session) {
 	end := time.Now()
 	begin := sess.Start.UnixNano()
 	info += fmt.Sprintf(" - Duration: %v", end.Sub(start))
-	logProfile.Printf(`%d {"origin": "%s", "role": "%s", "info": "%s", "start": %d, "end": %d}`, begin, origin, role, info, start.UnixNano()-begin, end.UnixNano()-begin)
+	logBenchmark.Printf(`%d {"origin": "%s", "role": "%s", "info": "%s", "start": %d, "end": %d}`, begin, origin, role, info, start.UnixNano()-begin, end.UnixNano()-begin)
 	if *monitor {
 		event := fmt.Sprintf("event: %s\ndata: "+`{"session": "%d", "origin": "%s", "role": "%s", "info": "%s", "start": %d, "end": %d}`, role, begin, origin, role, info, start.UnixNano()-begin, end.UnixNano()-begin)
 		broker.Notifier <- []byte(event)
@@ -490,7 +490,7 @@ func profileTime(origin string, role string, info string, start time.Time, sess 
 
 func setNavRels(basetm *list.List, dttmp *time.Time, sess *Session) (navonly bool, closest string) {
 	start := time.Now()
-	defer profileTime("AGGREGATOR", "setnav", "Navigational relations annotated", start, sess)
+	defer benchmarker("AGGREGATOR", "setnav", "Navigational relations annotated", start, sess)
 	itm := basetm.Front().Value.(Link)
 	itm.NavRels = append(itm.NavRels, "first")
 	basetm.Front().Value = itm
@@ -541,8 +541,8 @@ func memgatorCli(urir string, format string, dttmp *time.Time) {
 	start := time.Now()
 	sess := new(Session)
 	sess.Start = start
-	defer profileTime("SESSION", "session", "Complete session", start, sess)
-	profileTime("AGGREGATOR", "createsess", "Session created", start, sess)
+	defer benchmarker("SESSION", "session", "Complete session", start, sess)
+	benchmarker("AGGREGATOR", "createsess", "Session created", start, sess)
 	logInfo.Printf("Aggregating Mementos for %s", urir)
 	basetm := aggregateTimemap(urir, dttmp, sess)
 	if basetm.Len() == 0 {
@@ -561,8 +561,8 @@ func memgatorService(w http.ResponseWriter, r *http.Request, urir string, format
 	start := time.Now()
 	sess := new(Session)
 	sess.Start = start
-	defer profileTime("SESSION", "setnav", "Complete session", start, sess)
-	profileTime("AGGREGATOR", "createsess", "Session created", start, sess)
+	defer benchmarker("SESSION", "setnav", "Complete session", start, sess)
+	benchmarker("AGGREGATOR", "createsess", "Session created", start, sess)
 	logInfo.Printf("Aggregating Mementos for %s", urir)
 	basetm := aggregateTimemap(urir, dttmp, sess)
 	w.Header().Set("Access-Control-Allow-Origin", "*")
@@ -734,7 +734,7 @@ func initLoggers() {
 	logFatal = log.New(os.Stderr, "FATAL: ", log.Lshortfile)
 	errorHandle := os.Stderr
 	infoHandle := ioutil.Discard
-	profileHandle := ioutil.Discard
+	benchmarkHandle := ioutil.Discard
 	if *logfile != "" {
 		lgf, err := os.OpenFile(*logfile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 		if err != nil {
@@ -742,23 +742,23 @@ func initLoggers() {
 		}
 		errorHandle = lgf
 		infoHandle = lgf
-		profileHandle = lgf
+		benchmarkHandle = lgf
 	}
-	if *profile != "" {
-		prf, err := os.OpenFile(*profile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	if *benchmark != "" {
+		prf, err := os.OpenFile(*benchmark, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 		if err != nil {
-			logFatal.Fatalf("Error opening profile file (%s): %v\n", *profile, err)
+			logFatal.Fatalf("Error opening benchmark file (%s): %v\n", *benchmark, err)
 		}
-		profileHandle = prf
+		benchmarkHandle = prf
 	}
 	if *verbose {
 		errorHandle = os.Stderr
 		infoHandle = os.Stderr
-		profileHandle = os.Stderr
+		benchmarkHandle = os.Stderr
 	}
 	logError = log.New(errorHandle, "ERROR: ", log.Ldate|log.Lmicroseconds|log.Lshortfile)
 	logInfo = log.New(infoHandle, "INFO: ", log.Ldate|log.Lmicroseconds)
-	logProfile = log.New(profileHandle, "PROFILE: ", log.Ldate|log.Lmicroseconds)
+	logBenchmark = log.New(benchmarkHandle, "BENCHMARK: ", log.Ldate|log.Lmicroseconds)
 }
 
 func initNetwork() {
