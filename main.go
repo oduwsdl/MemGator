@@ -49,8 +49,6 @@ var contact = flag.String([]string{"c", "-contact"}, "@WebSciDL", "Email/URL/Twi
 var agent = flag.String([]string{"A", "-agent"}, fmt.Sprintf("%s:%s <{CONTACT}>", Name, Version), "User-agent string sent to archives")
 var host = flag.String([]string{"H", "-host"}, "localhost", "Host name - only used in web service mode")
 var servicebase = flag.String([]string{"s", "-service"}, "http://{HOST}[:{PORT}]", "Service base URL - default based on host & port")
-var mapbase = flag.String([]string{"m", "-timemap"}, "http://{SERVICE}/timemap", "TimeMap base URL - default based on service URL")
-var gatebase = flag.String([]string{"g", "-timegate"}, "http://{SERVICE}/timegate", "TimeGate base URL - default based on service URL")
 var port = flag.Int([]string{"p", "-port"}, 1208, "Port number - only used in web service mode")
 var topk = flag.Int([]string{"k", "-topk"}, -1, "Aggregate only top k archives based on probability")
 var tolerance = flag.Int([]string{"F", "-tolerance"}, -1, "Failure tolerance limit for each archive")
@@ -320,7 +318,7 @@ func serializeLinks(urir string, basetm *list.List, format string, dataCh chan s
 	case "link":
 		dataCh <- fmt.Sprintf(`<%s>; rel="original",`+"\n", urir)
 		if !navonly {
-			dataCh <- fmt.Sprintf(`<%s/link/%s>; rel="self"; type="application/link-format",`+"\n", *mapbase, urir)
+			dataCh <- fmt.Sprintf(`<%s/timemap/link/%s>; rel="self"; type="application/link-format",`+"\n", *servicebase, urir)
 		}
 		for e := basetm.Front(); e != nil; e = e.Next() {
 			lnk := e.Value.(Link)
@@ -334,14 +332,14 @@ func serializeLinks(urir string, basetm *list.List, format string, dataCh chan s
 			}
 			dataCh <- fmt.Sprintf(`<%s>; rel="%s"; datetime="%s",`+"\n", lnk.Href, rels, lnk.Datetime)
 		}
-		dataCh <- fmt.Sprintf(`<%s/link/%s>; anchor="%s"; rel="timemap"; type="application/link-format",`+"\n", *mapbase, urir, urir)
-		dataCh <- fmt.Sprintf(`<%s/json/%s>; anchor="%s"; rel="timemap"; type="application/json",`+"\n", *mapbase, urir, urir)
-		dataCh <- fmt.Sprintf(`<%s/cdxj/%s>; anchor="%s"; rel="timemap"; type="application/cdxj+ors",`+"\n", *mapbase, urir, urir)
-		dataCh <- fmt.Sprintf(`<%s/%s>; anchor="%s"; rel="timegate"`+"\n", *gatebase, urir, urir)
+		dataCh <- fmt.Sprintf(`<%s/timemap/link/%s>; anchor="%s"; rel="timemap"; type="application/link-format",`+"\n", *servicebase, urir, urir)
+		dataCh <- fmt.Sprintf(`<%s/timemap/json/%s>; anchor="%s"; rel="timemap"; type="application/json",`+"\n", *servicebase, urir, urir)
+		dataCh <- fmt.Sprintf(`<%s/timemap/cdxj/%s>; anchor="%s"; rel="timemap"; type="application/cdxj+ors",`+"\n", *servicebase, urir, urir)
+		dataCh <- fmt.Sprintf(`<%s/timegate/%s>; anchor="%s"; rel="timegate"`+"\n", *servicebase, urir, urir)
 	case "json":
 		dataCh <- fmt.Sprintf("{\n"+`  "original_uri": "%s",`+"\n", urir)
 		if !navonly {
-			dataCh <- fmt.Sprintf(`  "self": "%s/json/%s",`+"\n", *mapbase, urir)
+			dataCh <- fmt.Sprintf(`  "self": "%s/timemap/json/%s",`+"\n", *servicebase, urir)
 		}
 		dataCh <- fmt.Sprintf(`  "mementos": {` + "\n")
 		if !navonly {
@@ -370,19 +368,19 @@ func serializeLinks(urir string, basetm *list.List, format string, dataCh chan s
 		}
 		dataCh <- strings.TrimRight(navs, ",\n")
 		dataCh <- fmt.Sprintf("\n  },\n" + `  "timemap_uri": {` + "\n")
-		dataCh <- fmt.Sprintf(`    "link_format": "%s/link/%s",`+"\n", *mapbase, urir)
-		dataCh <- fmt.Sprintf(`    "json_format": "%s/json/%s",`+"\n", *mapbase, urir)
-		dataCh <- fmt.Sprintf(`    "cdxj_format": "%s/cdxj/%s"`+"\n  },\n", *mapbase, urir)
-		dataCh <- fmt.Sprintf(`  "timegate_uri": "%s/%s"`+"\n}\n", *gatebase, urir)
+		dataCh <- fmt.Sprintf(`    "link_format": "%s/timemap/link/%s",`+"\n", *servicebase, urir)
+		dataCh <- fmt.Sprintf(`    "json_format": "%s/timemap/json/%s",`+"\n", *servicebase, urir)
+		dataCh <- fmt.Sprintf(`    "cdxj_format": "%s/timemap/cdxj/%s"`+"\n  },\n", *servicebase, urir)
+		dataCh <- fmt.Sprintf(`  "timegate_uri": "%s/timegate/%s"`+"\n}\n", *servicebase, urir)
 	case "cdxj":
 		dataCh <- fmt.Sprintf(`@context ["http://tools.ietf.org/html/rfc7089"]` + "\n")
 		if !navonly {
-			dataCh <- fmt.Sprintf(`@id {"uri": "%s/cdxj/%s"}`+"\n", *mapbase, urir)
+			dataCh <- fmt.Sprintf(`@id {"uri": "%s/timemap/cdxj/%s"}`+"\n", *servicebase, urir)
 		}
 		dataCh <- fmt.Sprintf(`@keys ["memento_datetime_YYYYMMDDhhmmss"]` + "\n")
 		dataCh <- fmt.Sprintf(`@meta {"original_uri": "%s"}`+"\n", urir)
-		dataCh <- fmt.Sprintf(`@meta {"timegate_uri": "%s/%s"}`+"\n", *gatebase, urir)
-		dataCh <- fmt.Sprintf(`@meta {"timemap_uri": {"link_format": "%s/link/%s", "json_format": "%s/json/%s", "cdxj_format": "%s/cdxj/%s"}`+"\n", *mapbase, urir, *mapbase, urir, *mapbase, urir)
+		dataCh <- fmt.Sprintf(`@meta {"timegate_uri": "%s/timegate/%s"}`+"\n", *servicebase, urir)
+		dataCh <- fmt.Sprintf(`@meta {"timemap_uri": {"link_format": "%s/timemap/link/%s", "json_format": "%s/timemap/json/%s", "cdxj_format": "%s/timemap/cdxj/%s"}`+"\n", *servicebase, urir, *servicebase, urir, *servicebase, urir)
 		for e := basetm.Front(); e != nil; e = e.Next() {
 			lnk := e.Value.(Link)
 			if navonly && lnk.NavRels == nil {
@@ -693,16 +691,10 @@ func overrideFlags() {
 			*servicebase = fmt.Sprintf("http://%s:%d", *host, *port)
 		}
 	}
-	if *mapbase == "http://{SERVICE}/timemap" {
-		*mapbase = fmt.Sprintf("%s/timemap", *servicebase)
-	}
-	if *gatebase == "http://{SERVICE}/timegate" {
-		*gatebase = fmt.Sprintf("%s/timegate", *servicebase)
-	}
 }
 
 func serviceInfo() (msg string) {
-	return fmt.Sprintf("TimeMap  : %s/link|json|cdxj/{URI-R}\nTimeGate : %s/{URI-R} [Accept-Datetime]\nTimeNav  : %s/timenav/link|json|cdxj/{YYYY[MM[DD[hh[mm[ss]]]]]}/{URI-R}\nRedirect : %s/redirect/{YYYY[MM[DD[hh[mm[ss]]]]]}/{URI-R}\n", *mapbase, *gatebase, *servicebase, *servicebase)
+	return fmt.Sprintf("TimeMap  : %s/timemap/link|json|cdxj/{URI-R}\nTimeGate : %s/timegate/{URI-R} [Accept-Datetime]\nTimeNav  : %s/timenav/link|json|cdxj/{YYYY[MM[DD[hh[mm[ss]]]]]}/{URI-R}\nRedirect : %s/redirect/{YYYY[MM[DD[hh[mm[ss]]]]]}/{URI-R}\n", *servicebase, *servicebase, *servicebase, *servicebase)
 }
 
 func appInfo() (msg string) {
