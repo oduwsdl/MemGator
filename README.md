@@ -39,10 +39,15 @@ When run as a Web Service, MemGator exposes four customizable endpoints as follo
 
 ```
 $ memgator [options] server
-TimeMap  : http://localhost:1208/timemap/link|json|cdxj/{URI-R}
+TimeMap  : http://localhost:1208/timemap/{FORMAT}/{URI-R}
 TimeGate : http://localhost:1208/timegate/{URI-R} [Accept-Datetime]
-TimeNav  : http://localhost:1208/timenav/link|json|cdxj/{YYYY[MM[DD[hh[mm[ss]]]]]}/{URI-R}
-Redirect : http://localhost:1208/redirect/{YYYY[MM[DD[hh[mm[ss]]]]]}/{URI-R}
+TimeNav  : http://localhost:1208/timenav/{FORMAT}/{DATETIME}/{URI-R}
+Redirect : http://localhost:1208/redirect/{DATETIME}/{URI-R}
+Timeline : http://localhost:1208/monitor [SSE]
+
+# FORMAT          => link|json|cdxj
+# DATETIME        => YYYY[MM[DD[hh[mm[ss]]]]]
+# Accept-Datetime => Header in RFC1123 format
 ```
 
 The `TimeMap` and `TimeGate` responses are in accordance with the [Memento RFC](http://tools.ietf.org/html/rfc7089). Additionally, the TimeMap endpoint also supports some additional serialization formats. The `TimeNav` service is a URL friendly way to expose the same information in the response body (in various formats) as available in the `Link` header of the `TimeGate` response without the need of a header based time negotiation. The `Redirect` service resolves the datetime (full or partial) passed in the URL and redirects to the closest Memento.
@@ -74,29 +79,30 @@ MemGator {Version}
 \__/___\__/\____\__|_|__/\_______/_____|__|\___/|__|
 
 Usage:
-  memgator [options] {URI-R}                                  # TimeMap CLI
-  memgator [options] {URI-R} {YYYY[MM[DD[hh[mm[ss]]]]]}       # TimeGate CLI
-  memgator [options] server                                   # Run as a Web Service
+  memgator [options] {URI-R}                           # TimeMap CLI
+  memgator [options] {URI-R} YYYY[MM[DD[hh[mm[ss]]]]]  # TimeGate CLI
+  memgator [options] server                            # Run as a Web Service
 
 Options:
-  -A, --agent=MemGator:{Version} <{CONTACT}>                  User-agent string sent to archives
-  -a, --arcs=http://oduwsdl.github.io/memgator/archives.json  Local/remote JSON file path/URL for list of archives
-  -c, --contact=@WebSciDL                                     Email/URL/Twitter handle - Used in the user-agent
-  -d, --dormant=15m0s                                         Dormant period after consecutive failures
-  -F, --tolerance=-1                                          Failure tolerance limit for each archive
-  -f, --format=Link                                           Output format - Link/JSON/CDXJ
-  -H, --host=localhost                                        Host name - only used in web service mode
-  -k, --topk=-1                                               Aggregate only top k archives based on probability
-  -l, --log=                                                  Log file location - Defaults to STDERR
-  -P, --profile=                                              Profile file location - Defaults to Logfile
-  -p, --port=1208                                             Port number - only used in web service mode
-  -r, --restimeout=1m0s                                       Response timeout for each archive
-  -S, --spoof=false                                           Spoof each request with a random user-agent
-  -s, --service=http://{HOST}[:{PORT}]                        Service base URL - default based on host & port
-  -T, --hdrtimeout=30s                                        Header timeout for each archive
-  -t, --contimeout=5s                                         Connection timeout for each archive
-  -V, --verbose=false                                         Show Log and Profiling messages on STDERR
-  -v, --version=false                                         Show name and version
+  -A, --agent=MemGator:{Version} <{CONTACT}>  User-agent string sent to archives
+  -a, --arcs=http://git.io/archives           Local/remote JSON file path/URL for list of archives
+  -b, --benchmark=                            Benchmark file location - Defaults to Logfile
+  -c, --contact=@WebSciDL                     Email/URL/Twitter handle - Used in the user-agent
+  -d, --dormant=15m0s                         Dormant period after consecutive failures
+  -F, --tolerance=-1                          Failure tolerance limit for each archive
+  -f, --format=Link                           Output format - Link/JSON/CDXJ
+  -H, --host=localhost                        Host name - only used in web service mode
+  -k, --topk=-1                               Aggregate only top k archives based on probability
+  -l, --log=                                  Log file location - Defaults to STDERR
+  -m, --monitor=false                         Timeline monitoring via SSE
+  -p, --port=1208                             Port number - only used in web service mode
+  -r, --restimeout=1m0s                       Response timeout for each archive
+  -S, --spoof=false                           Spoof each request with a random user-agent
+  -s, --service=http://{HOST}[:{PORT}]        Service base URL - default based on host & port
+  -T, --hdrtimeout=30s                        Header timeout for each archive
+  -t, --contimeout=5s                         Connection timeout for each archive
+  -V, --verbose=false                         Show Info and Profiling messages on STDERR
+  -v, --version=false                         Show name and version
 ```
 
 ## Build

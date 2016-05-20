@@ -33,6 +33,12 @@ const (
 `
 )
 
+// Name consts need explanation, TODO
+const (
+	responseFormats = "link|json|cdxj"
+	validDatetimes  = "YYYY[MM[DD[hh[mm[ss]]]]]"
+)
+
 var (
 	logBenchmark *log.Logger
 	logInfo      *log.Logger
@@ -617,7 +623,7 @@ func router(w http.ResponseWriter, r *http.Request) {
 			format = p[1]
 			rawuri = p[2]
 		} else {
-			err = fmt.Errorf("/timemap/link|json|cdxj/{URI-R}")
+			err = fmt.Errorf("/timemap/{FORMAT}/{URI-R} (FORMAT => %s)", responseFormats)
 		}
 	case "timenav":
 		if regs["tnavpth"].MatchString(requri) {
@@ -626,7 +632,7 @@ func router(w http.ResponseWriter, r *http.Request) {
 			rawdtm = p[2]
 			rawuri = p[3]
 		} else {
-			err = fmt.Errorf("/timenav/link|json|cdxj/{YYYY[MM[DD[hh[mm[ss]]]]]}/{URI-R}")
+			err = fmt.Errorf("/timenav/{FORMAT}/{DATETIME}/{URI-R} (FORMAT => %s, DATETIME => %s)", responseFormats, validDatetimes)
 		}
 	case "redirect":
 		if regs["rdrcpth"].MatchString(requri) {
@@ -635,7 +641,7 @@ func router(w http.ResponseWriter, r *http.Request) {
 			rawdtm = p[1]
 			rawuri = p[2]
 		} else {
-			err = fmt.Errorf("/redirect/{YYYY[MM[DD[hh[mm[ss]]]]]}/{URI-R}")
+			err = fmt.Errorf("/redirect/{DATETIME}/{URI-R} (DATETIME => %s)", validDatetimes)
 		}
 	case "timegate":
 		if regs["tgatpth"].MatchString(requri) {
@@ -687,7 +693,7 @@ func router(w http.ResponseWriter, r *http.Request) {
 		dttm, err = paddedTime(rawdtm)
 		if err != nil {
 			logError.Printf("Time parsing error (%s): %v", rawdtm, err)
-			http.Error(w, "Malformed datetime: "+rawdtm+"\nExpected format: YYYY[MM[DD[hh[mm[ss]]]]]", http.StatusBadRequest)
+			http.Error(w, "Malformed datetime: "+rawdtm+"\nExpected format: "+validDatetimes, http.StatusBadRequest)
 			return
 		}
 	}
@@ -708,10 +714,11 @@ func overrideFlags() {
 }
 
 func serviceInfo() (msg string) {
-	msg = fmt.Sprintf("TimeMap  : %s/timemap/link|json|cdxj/{URI-R}\nTimeGate : %s/timegate/{URI-R} [Accept-Datetime]\nTimeNav  : %s/timenav/link|json|cdxj/{YYYY[MM[DD[hh[mm[ss]]]]]}/{URI-R}\nRedirect : %s/redirect/{YYYY[MM[DD[hh[mm[ss]]]]]}/{URI-R}\n", *servicebase, *servicebase, *servicebase, *servicebase)
+	msg = fmt.Sprintf("TimeMap  : %s/timemap/{FORMAT}/{URI-R}\nTimeGate : %s/timegate/{URI-R} [Accept-Datetime]\nTimeNav  : %s/timenav/{FORMAT}/{DATETIME}/{URI-R}\nRedirect : %s/redirect/{DATETIME}/{URI-R}\n", *servicebase, *servicebase, *servicebase, *servicebase)
 	if *monitor {
 		msg += fmt.Sprintf("Timeline : %s/monitor [SSE]\n", *servicebase)
 	}
+	msg += fmt.Sprintf("\n# FORMAT          => %s\n# DATETIME        => %s\n# Accept-Datetime => Header in RFC1123 format\n", responseFormats, validDatetimes)
 	return
 }
 
@@ -722,9 +729,9 @@ func appInfo() (msg string) {
 func usage() {
 	fmt.Fprintf(os.Stderr, appInfo())
 	fmt.Fprintf(os.Stderr, "Usage:\n")
-	fmt.Fprintf(os.Stderr, "  %s [options] {URI-R}                                # TimeMap CLI\n", os.Args[0])
-	fmt.Fprintf(os.Stderr, "  %s [options] {URI-R} {YYYY[MM[DD[hh[mm[ss]]]]]}     # TimeGate CLI\n", os.Args[0])
-	fmt.Fprintf(os.Stderr, "  %s [options] server                                 # Run as a Web Service\n", os.Args[0])
+	fmt.Fprintf(os.Stderr, "  %s [options] {URI-R}                           # TimeMap CLI\n", os.Args[0])
+	fmt.Fprintf(os.Stderr, "  %s [options] {URI-R} %s  # TimeGate CLI\n", os.Args[0], validDatetimes)
+	fmt.Fprintf(os.Stderr, "  %s [options] server                            # Run as a Web Service\n", os.Args[0])
 	fmt.Fprintf(os.Stderr, "\nOptions:\n")
 	flag.PrintDefaults()
 	fmt.Fprintf(os.Stderr, "\n")
@@ -828,7 +835,7 @@ func main() {
 					logFatal.Fatalf("Time parsing error (%s): %v\n", rawdtm, err)
 				}
 			} else {
-				logFatal.Fatalf("Malformed datetime {YYYY[MM[DD[hh[mm[ss]]]]]}: %s\n", rawdtm)
+				logFatal.Fatalf("Malformed datetime (%s): %s\n", validDatetimes, rawdtm)
 			}
 		}
 		memgatorCli(urir, *format, dttm)
