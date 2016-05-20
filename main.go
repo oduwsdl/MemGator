@@ -44,7 +44,7 @@ var (
 )
 
 var format = flag.String([]string{"f", "-format"}, "Link", "Output format - Link/JSON/CDXJ")
-var arcsloc = flag.String([]string{"a", "-arcs"}, "http://oduwsdl.github.io/memgator/archives.json", "Local/remote JSON file path/URL for list of archives")
+var arcsloc = flag.String([]string{"a", "-arcs"}, "http://git.io/archives", "Local/remote JSON file path/URL for list of archives")
 var logfile = flag.String([]string{"l", "-log"}, "", "Log file location - Defaults to STDERR")
 var benchmark = flag.String([]string{"b", "-benchmark", "#P", "#-profile"}, "", "Benchmark file location - Defaults to Logfile")
 var contact = flag.String([]string{"c", "-contact"}, "@WebSciDL", "Email/URL/Twitter handle - Used in the user-agent")
