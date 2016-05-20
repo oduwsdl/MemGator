@@ -63,7 +63,7 @@ var tolerance = flag.Int([]string{"F", "-tolerance"}, -1, "Failure tolerance lim
 var verbose = flag.Bool([]string{"V", "-verbose"}, false, "Show Info and Profiling messages on STDERR")
 var version = flag.Bool([]string{"v", "-version"}, false, "Show name and version")
 var spoof = flag.Bool([]string{"S", "-spoof"}, false, "Spoof each request with a random user-agent")
-var monitor = flag.Bool([]string{"m", "-monitor"}, false, "Timeline monitoring via SSE")
+var monitor = flag.Bool([]string{"m", "-monitor"}, false, "Benchmarck monitoring via SSE")
 var contimeout = flag.Duration([]string{"t", "-contimeout"}, time.Duration(5*time.Second), "Connection timeout for each archive")
 var hdrtimeout = flag.Duration([]string{"T", "-hdrtimeout"}, time.Duration(30*time.Second), "Header timeout for each archive")
 var restimeout = flag.Duration([]string{"r", "-restimeout"}, time.Duration(60*time.Second), "Response timeout for each archive")
@@ -663,11 +663,11 @@ func router(w http.ResponseWriter, r *http.Request) {
 		}
 	case "monitor":
 		if *monitor {
-			logInfo.Printf("Timeline monitoring client connected")
+			logInfo.Printf("Benchmarck monitoring client connected")
 			broker.ServeHTTP(w, r)
 		} else {
-			logError.Printf("Timeline monitoring not enabled, use --monitor flag to enable it")
-			http.Error(w, "Timeline monitoring not enabled", http.StatusNotImplemented)
+			logError.Printf("Benchmarck monitoring not enabled, use --monitor flag to enable it")
+			http.Error(w, "Benchmarck monitoring not enabled", http.StatusNotImplemented)
 		}
 		return
 	case "":
@@ -714,9 +714,9 @@ func overrideFlags() {
 }
 
 func serviceInfo() (msg string) {
-	msg = fmt.Sprintf("TimeMap  : %s/timemap/{FORMAT}/{URI-R}\nTimeGate : %s/timegate/{URI-R} [Accept-Datetime]\nTimeNav  : %s/timenav/{FORMAT}/{DATETIME}/{URI-R}\nRedirect : %s/redirect/{DATETIME}/{URI-R}\n", *servicebase, *servicebase, *servicebase, *servicebase)
+	msg = fmt.Sprintf("TimeMap    : %s/timemap/{FORMAT}/{URI-R}\nTimeGate   : %s/timegate/{URI-R} [Accept-Datetime]\nTimeNav    : %s/timenav/{FORMAT}/{DATETIME}/{URI-R}\nRedirect   : %s/redirect/{DATETIME}/{URI-R}\n", *servicebase, *servicebase, *servicebase, *servicebase)
 	if *monitor {
-		msg += fmt.Sprintf("Timeline : %s/monitor [SSE]\n", *servicebase)
+		msg += fmt.Sprintf("Benchmarck : %s/monitor [SSE]\n", *servicebase)
 	}
 	msg += fmt.Sprintf("\n# FORMAT          => %s\n# DATETIME        => %s\n# Accept-Datetime => Header in RFC1123 format\n", responseFormats, validDatetimes)
 	return

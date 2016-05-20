@@ -39,11 +39,11 @@ When run as a Web Service, MemGator exposes four customizable endpoints as follo
 
 ```
 $ memgator [options] server
-TimeMap  : http://localhost:1208/timemap/{FORMAT}/{URI-R}
-TimeGate : http://localhost:1208/timegate/{URI-R} [Accept-Datetime]
-TimeNav  : http://localhost:1208/timenav/{FORMAT}/{DATETIME}/{URI-R}
-Redirect : http://localhost:1208/redirect/{DATETIME}/{URI-R}
-Timeline : http://localhost:1208/monitor [SSE]
+TimeMap    : http://localhost:1208/timemap/{FORMAT}/{URI-R}
+TimeGate   : http://localhost:1208/timegate/{URI-R} [Accept-Datetime]
+TimeNav    : http://localhost:1208/timenav/{FORMAT}/{DATETIME}/{URI-R}
+Redirect   : http://localhost:1208/redirect/{DATETIME}/{URI-R}
+Benchmarck : http://localhost:1208/monitor [SSE]
 
 # FORMAT          => link|json|cdxj
 # DATETIME        => YYYY[MM[DD[hh[mm[ss]]]]]
