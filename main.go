@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	flag "github.com/oduwsdl/memgator/pkg/mflag"
+	"github.com/oduwsdl/memgator/pkg/sse"
 	"io/ioutil"
 	"log"
 	"math/rand"
@@ -39,6 +40,7 @@ var (
 	logFatal   *log.Logger
 	transport  http.Transport
 	client     http.Client
+	broker     *sse.Broker
 )
 
 var format = flag.String([]string{"f", "-format"}, "Link", "Output format - Link/JSON/CDXJ")
@@ -55,6 +57,7 @@ var tolerance = flag.Int([]string{"F", "-tolerance"}, -1, "Failure tolerance lim
 var verbose = flag.Bool([]string{"V", "-verbose"}, false, "Show Info and Profiling messages on STDERR")
 var version = flag.Bool([]string{"v", "-version"}, false, "Show name and version")
 var spoof = flag.Bool([]string{"S", "-spoof"}, false, "Spoof each request with a random user-agent")
+var monitor = flag.Bool([]string{"m", "-monitor"}, false, "Timeline monitoring via SSE")
 var contimeout = flag.Duration([]string{"t", "-contimeout"}, time.Duration(5*time.Second), "Connection timeout for each archive")
 var hdrtimeout = flag.Duration([]string{"T", "-hdrtimeout"}, time.Duration(30*time.Second), "Header timeout for each archive")
 var restimeout = flag.Duration([]string{"r", "-restimeout"}, time.Duration(60*time.Second), "Response timeout for each archive")
@@ -479,6 +482,10 @@ func profileTime(origin string, role string, info string, start time.Time, sess 
 	begin := sess.Start.UnixNano()
 	info += fmt.Sprintf(" - Duration: %v", end.Sub(start))
 	logProfile.Printf(`%d {"origin": "%s", "role": "%s", "info": "%s", "start": %d, "end": %d}`, begin, origin, role, info, start.UnixNano()-begin, end.UnixNano()-begin)
+	if *monitor {
+		event := fmt.Sprintf("event: %s\ndata: "+`{"session": "%d", "origin": "%s", "role": "%s", "info": "%s", "start": %d, "end": %d}`, role, begin, origin, role, info, start.UnixNano()-begin, end.UnixNano()-begin)
+		broker.Notifier <- []byte(event)
+	}
 }
 
 func setNavRels(basetm *list.List, dttmp *time.Time, sess *Session) (navonly bool, closest string) {
@@ -648,6 +655,15 @@ func router(w http.ResponseWriter, r *http.Request) {
 		} else {
 			err = fmt.Errorf("/timegate/{URI-R}")
 		}
+	case "monitor":
+		if *monitor {
+			logInfo.Printf("Timeline monitoring client connected")
+			broker.ServeHTTP(w, r)
+		} else {
+			logError.Printf("Timeline monitoring not enabled, use --monitor flag to enable it")
+			http.Error(w, "Timeline monitoring not enabled", http.StatusNotImplemented)
+		}
+		return
 	case "":
 		fmt.Fprint(w, serviceInfo())
 		return
@@ -692,7 +708,11 @@ func overrideFlags() {
 }
 
 func serviceInfo() (msg string) {
-	return fmt.Sprintf("TimeMap  : %s/timemap/link|json|cdxj/{URI-R}\nTimeGate : %s/timegate/{URI-R} [Accept-Datetime]\nTimeNav  : %s/timenav/link|json|cdxj/{YYYY[MM[DD[hh[mm[ss]]]]]}/{URI-R}\nRedirect : %s/redirect/{YYYY[MM[DD[hh[mm[ss]]]]]}/{URI-R}\n", *servicebase, *servicebase, *servicebase, *servicebase)
+	msg = fmt.Sprintf("TimeMap  : %s/timemap/link|json|cdxj/{URI-R}\nTimeGate : %s/timegate/{URI-R} [Accept-Datetime]\nTimeNav  : %s/timenav/link|json|cdxj/{YYYY[MM[DD[hh[mm[ss]]]]]}/{URI-R}\nRedirect : %s/redirect/{YYYY[MM[DD[hh[mm[ss]]]]]}/{URI-R}\n", *servicebase, *servicebase, *servicebase, *servicebase)
+	if *monitor {
+		msg += fmt.Sprintf("Timeline : %s/monitor [SSE]\n", *servicebase)
+	}
+	return
 }
 
 func appInfo() (msg string) {
@@ -787,6 +807,9 @@ func main() {
 	if target == "server" {
 		fmt.Printf(appInfo())
 		fmt.Printf(serviceInfo())
+		if *monitor {
+			broker = sse.NewServer()
+		}
 		addr := fmt.Sprintf(":%d", *port)
 		err = http.ListenAndServe(addr, http.HandlerFunc(router))
 		if err != nil {
