@@ -19,6 +19,16 @@
         margin: 10px;
       }
     </style>
+    <script type="text/javascript">
+    if (!!window.EventSource) {
+      var source = new EventSource('http://localhost:1208/monitor');
+      source.onmessage = function (msg) {
+        console.log(msg)
+      }
+    } else {
+      console.log('Browser does not support SSE!');
+    }
+    </script>
   </head>
   <body>
     <img src="memgator_logo.png" alt="MemGator"/>
