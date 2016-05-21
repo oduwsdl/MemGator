@@ -63,7 +63,7 @@ var tolerance = flag.Int([]string{"F", "-tolerance"}, -1, "Failure tolerance lim
 var verbose = flag.Bool([]string{"V", "-verbose"}, false, "Show Info and Profiling messages on STDERR")
 var version = flag.Bool([]string{"v", "-version"}, false, "Show name and version")
 var spoof = flag.Bool([]string{"S", "-spoof"}, false, "Spoof each request with a random user-agent")
-var monitor = flag.Bool([]string{"m", "-monitor"}, false, "Benchmarck monitoring via SSE")
+var monitor = flag.Bool([]string{"m", "-monitor"}, false, "Benchmark monitoring via SSE")
 var contimeout = flag.Duration([]string{"t", "-contimeout"}, time.Duration(5*time.Second), "Connection timeout for each archive")
 var hdrtimeout = flag.Duration([]string{"T", "-hdrtimeout"}, time.Duration(30*time.Second), "Header timeout for each archive")
 var restimeout = flag.Duration([]string{"r", "-restimeout"}, time.Duration(60*time.Second), "Response timeout for each archive")
@@ -149,8 +149,8 @@ var regs = map[string]*regexp.Regexp{
 	"dttmstr": regexp.MustCompile(`^(\d{4})(\d{2})?(\d{2})?(\d{2})?(\d{2})?(\d{2})?$`),
 	"tmappth": regexp.MustCompile(`^timemap/(link|json|cdxj)/.+`),
 	"tgatpth": regexp.MustCompile(`^timegate/.+`),
-	"tnavpth": regexp.MustCompile(`^timenav/(link|json|cdxj)/(\d{4})(\d{2})?(\d{2})?(\d{2})?(\d{2})?(\d{2})?/.+`),
-	"rdrcpth": regexp.MustCompile(`^redirect/(\d{4})(\d{2})?(\d{2})?(\d{2})?(\d{2})?(\d{2})?/.+`),
+	"descpth": regexp.MustCompile(`^memento/(link|json|cdxj)/(\d{4})(\d{2})?(\d{2})?(\d{2})?(\d{2})?(\d{2})?/.+`),
+	"rdrcpth": regexp.MustCompile(`^memento/(\d{4})(\d{2})?(\d{2})?(\d{2})?(\d{2})?(\d{2})?/.+`),
 }
 
 var spoofAgents = []string{
@@ -625,24 +625,6 @@ func router(w http.ResponseWriter, r *http.Request) {
 		} else {
 			err = fmt.Errorf("/timemap/{FORMAT}/{URI-R} (FORMAT => %s)", responseFormats)
 		}
-	case "timenav":
-		if regs["tnavpth"].MatchString(requri) {
-			p := strings.SplitN(requri, "/", 4)
-			format = p[1]
-			rawdtm = p[2]
-			rawuri = p[3]
-		} else {
-			err = fmt.Errorf("/timenav/{FORMAT}/{DATETIME}/{URI-R} (FORMAT => %s, DATETIME => %s)", responseFormats, validDatetimes)
-		}
-	case "redirect":
-		if regs["rdrcpth"].MatchString(requri) {
-			p := strings.SplitN(requri, "/", 3)
-			format = p[0]
-			rawdtm = p[1]
-			rawuri = p[2]
-		} else {
-			err = fmt.Errorf("/redirect/{DATETIME}/{URI-R} (DATETIME => %s)", validDatetimes)
-		}
 	case "timegate":
 		if regs["tgatpth"].MatchString(requri) {
 			p := strings.SplitN(requri, "/", 2)
@@ -661,13 +643,27 @@ func router(w http.ResponseWriter, r *http.Request) {
 		} else {
 			err = fmt.Errorf("/timegate/{URI-R}")
 		}
+	case "memento":
+		if regs["rdrcpth"].MatchString(requri) {
+			p := strings.SplitN(requri, "/", 3)
+			format = "redirect"
+			rawdtm = p[1]
+			rawuri = p[2]
+		} else if regs["descpth"].MatchString(requri) {
+			p := strings.SplitN(requri, "/", 4)
+			format = p[1]
+			rawdtm = p[2]
+			rawuri = p[3]
+		} else {
+			err = fmt.Errorf("/memento[/{FORMAT}]/{DATETIME}/{URI-R} (FORMAT => %s, DATETIME => %s)", responseFormats, validDatetimes)
+		}
 	case "monitor":
 		if *monitor {
-			logInfo.Printf("Benchmarck monitoring client connected")
+			logInfo.Printf("Benchmark monitoring client connected")
 			broker.ServeHTTP(w, r)
 		} else {
-			logError.Printf("Benchmarck monitoring not enabled, use --monitor flag to enable it")
-			http.Error(w, "Benchmarck monitoring not enabled", http.StatusNotImplemented)
+			logError.Printf("Benchmark monitoring not enabled, use --monitor flag to enable it")
+			http.Error(w, "Benchmark monitoring not enabled", http.StatusNotImplemented)
 		}
 		return
 	case "":
@@ -714,9 +710,9 @@ func overrideFlags() {
 }
 
 func serviceInfo() (msg string) {
-	msg = fmt.Sprintf("TimeMap    : %s/timemap/{FORMAT}/{URI-R}\nTimeGate   : %s/timegate/{URI-R} [Accept-Datetime]\nTimeNav    : %s/timenav/{FORMAT}/{DATETIME}/{URI-R}\nRedirect   : %s/redirect/{DATETIME}/{URI-R}\n", *servicebase, *servicebase, *servicebase, *servicebase)
+	msg = fmt.Sprintf("TimeMap   : %s/timemap/{FORMAT}/{URI-R}\nTimeGate  : %s/timegate/{URI-R} [Accept-Datetime]\nMemento   : %s/memento[/{FORMAT}]/{DATETIME}/{URI-R}\n", *servicebase, *servicebase, *servicebase)
 	if *monitor {
-		msg += fmt.Sprintf("Benchmarck : %s/monitor [SSE]\n", *servicebase)
+		msg += fmt.Sprintf("Benchmark : %s/monitor [SSE]\n", *servicebase)
 	}
 	msg += fmt.Sprintf("\n# FORMAT          => %s\n# DATETIME        => %s\n# Accept-Datetime => Header in RFC1123 format\n", responseFormats, validDatetimes)
 	return
@@ -729,9 +725,9 @@ func appInfo() (msg string) {
 func usage() {
 	fmt.Fprintf(os.Stderr, appInfo())
 	fmt.Fprintf(os.Stderr, "Usage:\n")
-	fmt.Fprintf(os.Stderr, "  %s [options] {URI-R}                           # TimeMap CLI\n", os.Args[0])
-	fmt.Fprintf(os.Stderr, "  %s [options] {URI-R} %s  # TimeGate CLI\n", os.Args[0], validDatetimes)
-	fmt.Fprintf(os.Stderr, "  %s [options] server                            # Run as a Web Service\n", os.Args[0])
+	fmt.Fprintf(os.Stderr, "  %s [options] {URI-R}                            # TimeMap from CLI\n", os.Args[0])
+	fmt.Fprintf(os.Stderr, "  %s [options] {URI-R} {%s} # Description of the closest Memento from CLI\n", os.Args[0], validDatetimes)
+	fmt.Fprintf(os.Stderr, "  %s [options] server                             # Run as a Web Service\n", os.Args[0])
 	fmt.Fprintf(os.Stderr, "\nOptions:\n")
 	flag.PrintDefaults()
 	fmt.Fprintf(os.Stderr, "\n")

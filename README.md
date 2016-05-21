@@ -6,7 +6,8 @@ A Memento Aggregator CLI and Server in [Go](https://golang.org/).
 
 * The binary (available for various platforms) can be used as the CLI or run as a Web Service
 * Results available in three formats - Link/JSON/CDXJ
-* TimeMap, TimeGate, TimeNav, and Redirect endpoints
+* TimeMap, TimeGate, and Memento (redirect or description) endpoints
+* Optional streaming of benchmarks over [Server-Sent Events](http://www.html5rocks.com/en/tutorials/eventsource/basics/) (SSE) for realtime visualization and monitoring
 * Good API parity with the [main Memento Aggregator service](http://timetravel.mementoweb.org/guide/api/)
 * Concurrent - Splits every session in subtasks for parallel execution
 * Parallel - Utilizes all the available CPUs
@@ -26,35 +27,39 @@ A Memento Aggregator CLI and Server in [Go](https://golang.org/).
 
 ### CLI
 
-Command line interface of MemGator allows retrieval of TimeMap and TimeGate over `STDOUT` in all supported formats. Info/Profiling (in verbose mode) and Error output is available on `STDERR` unless appropriate files are configured. For further details, see the full usage.
+Command line interface of MemGator allows retrieval of the TimeMap and the description of the closest Memento (equivalent to the TimeGate) over `STDOUT` in all supported formats. Logs and benchmarks (in verbose mode) and Error output are available on `STDERR` unless appropriate files are configured. For further details, see the full usage.
 
 ```
-$ memgator [options] {URI-R}                            # TimeMap CLI
-$ memgator [options] {URI-R} {YYYY[MM[DD[hh[mm[ss]]]]]} # TimeGate CLI
+$ memgator [options] {URI-R}                            # TimeMap from CLI
+$ memgator [options] {URI-R} {YYYY[MM[DD[hh[mm[ss]]]]]} # Description of the closest Memento from CLI
 ```
 
 ### Server
 
-When run as a Web Service, MemGator exposes four customizable endpoints as follows:
+When run as a Web Service, MemGator exposes following customizable endpoints:
 
 ```
 $ memgator [options] server
-TimeMap    : http://localhost:1208/timemap/{FORMAT}/{URI-R}
-TimeGate   : http://localhost:1208/timegate/{URI-R} [Accept-Datetime]
-TimeNav    : http://localhost:1208/timenav/{FORMAT}/{DATETIME}/{URI-R}
-Redirect   : http://localhost:1208/redirect/{DATETIME}/{URI-R}
-Benchmarck : http://localhost:1208/monitor [SSE]
+TimeMap   : http://localhost:1208/timemap/{FORMAT}/{URI-R}
+TimeGate  : http://localhost:1208/timegate/{URI-R} [Accept-Datetime]
+Memento   : http://localhost:1208/memento[/{FORMAT}]/{DATETIME}/{URI-R}
+Benchmark : http://localhost:1208/monitor [SSE]
 
 # FORMAT          => link|json|cdxj
 # DATETIME        => YYYY[MM[DD[hh[mm[ss]]]]]
 # Accept-Datetime => Header in RFC1123 format
 ```
 
-The `TimeMap` and `TimeGate` responses are in accordance with the [Memento RFC](http://tools.ietf.org/html/rfc7089). Additionally, the TimeMap endpoint also supports some additional serialization formats. The `TimeNav` service is a URL friendly way to expose the same information in the response body (in various formats) as available in the `Link` header of the `TimeGate` response without the need of a header based time negotiation. The `Redirect` service resolves the datetime (full or partial) passed in the URL and redirects to the closest Memento.
+* `TimeMap` endpoint serves an aggregated TimeMap for a given URI-R in accordance with the [Memento RFC](http://tools.ietf.org/html/rfc7089). Additionally, it makes sure that the Mementos are chronologically ordered. It also provides the TimeMap data serialized in additional experimental formats.
+* `TimeGate` endpoint allows datetime negotiation via the `Accept-Datetime` header in accordance with the [Memento RFC](http://tools.ietf.org/html/rfc7089). A successful response redirects to the closes Memento (to the given datetime) using the `Location` header. The default datetime is the current time. A successful response also includes a `Link` header which provides links to the first, last, next, and previous Mementos.
+* `Memento` endpoint allows datetime negotiation in the request URL itself for clients that cannot easily send custom request headers (as opposed to the `TimeGate` which requires the `Accept-Datetime` header). This endpoint behaves differently based on whether the `format` was specified in the request. It essentially splits the functionality of the `TimeGate` endpoint in two parts as follows:
+ * If a format is specified, it returns the description of the closest Memento (to the given datetime) in the specified format. It is essentially the same data that is available in the `Link` header of the `TimeGate` response, but as the payload in the format requested by the client.
+ * If a format is not specified, it redirects to the closest Memento (to the given datetime) using the `Location` header.
+* `Benchmark` is an optional endpoint that can be enabled by the `--monitor` flag when the server is started. If enabled, it provides a stream of the benchmark log over [SSE](http://www.html5rocks.com/en/tutorials/eventsource/basics/) for realtime visualization and monitoring.
 
 ## Download and Install
 
-Depending on the machine and operating system download appropriate binary from the [releases page](https://github.com/oduwsdl/memgator/releases). Changed the mode of the file to executable `chmod +x MemGator-BINARY`. Run from the current location of the downloaded binary or rename it to `memgator` and move it into a directory that is in the `PATH` (such as `/usr/local/bin/`).
+Depending on the machine and operating system download appropriate binary from the [releases page](https://github.com/oduwsdl/memgator/releases). Change the mode of the file to executable `chmod +x MemGator-BINARY`. Run from the current location of the downloaded binary or rename it to `memgator` and move it into a directory that is in the `PATH` (such as `/usr/local/bin/`) to make it available as a command.
 
 ## Running as a Docker Container
 
@@ -79,9 +84,9 @@ MemGator {Version}
 \__/___\__/\____\__|_|__/\_______/_____|__|\___/|__|
 
 Usage:
-  memgator [options] {URI-R}                           # TimeMap CLI
-  memgator [options] {URI-R} YYYY[MM[DD[hh[mm[ss]]]]]  # TimeGate CLI
-  memgator [options] server                            # Run as a Web Service
+  memgator [options] {URI-R}                            # TimeMap from CLI
+  memgator [options] {URI-R} {YYYY[MM[DD[hh[mm[ss]]]]]} # Description of the closest Memento from CLI
+  memgator [options] server                             # Run as a Web Service
 
 Options:
   -A, --agent=MemGator:{Version} <{CONTACT}>  User-agent string sent to archives
