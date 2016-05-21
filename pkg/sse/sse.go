@@ -50,7 +50,7 @@ func (broker *Broker) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		broker.closingClients <- messageChan
 	}()
 	for {
-		fmt.Fprintf(w, "%s\n\n", <-messageChan)
+		fmt.Fprintf(w, "data: %s\n\n", <-messageChan)
 		flusher.Flush()
 	}
 }
