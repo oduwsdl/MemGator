@@ -57,6 +57,7 @@ var contact = flag.String([]string{"c", "-contact"}, "@WebSciDL", "Email/URL/Twi
 var agent = flag.String([]string{"A", "-agent"}, fmt.Sprintf("%s:%s <{CONTACT}>", Name, Version), "User-agent string sent to archives")
 var host = flag.String([]string{"H", "-host"}, "localhost", "Host name - only used in web service mode")
 var servicebase = flag.String([]string{"s", "-service"}, "http://{HOST}[:{PORT}]", "Service base URL - default based on host & port")
+var static = flag.String([]string{"D", "-static"}, "", "Directory path to serve static assets from")
 var port = flag.Int([]string{"p", "-port"}, 1208, "Port number - only used in web service mode")
 var topk = flag.Int([]string{"k", "-topk"}, -1, "Aggregate only top k archives based on probability")
 var tolerance = flag.Int([]string{"F", "-tolerance"}, -1, "Failure tolerance limit for each archive")
@@ -666,10 +667,15 @@ func router(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Benchmark monitoring not enabled", http.StatusNotImplemented)
 		}
 		return
-	case "":
-		fmt.Fprint(w, serviceInfo())
-		return
 	default:
+		if *static != "" {
+			http.FileServer(http.Dir(*static)).ServeHTTP(w, r)
+			return
+		}
+		if endpoint == "" {
+			fmt.Fprint(w, serviceInfo())
+			return
+		}
 		logInfo.Printf("Delegated to default ServerMux: %s", r.URL.RequestURI())
 		http.DefaultServeMux.ServeHTTP(w, r)
 		return
