@@ -1,0 +1,39 @@
+#%RAML 1.0
+title: MemGator Server API
+version: 1
+baseUri: http://localhost:1208
+types: 
+  format:
+    type: string
+    enum: [link, json, cdxj]
+    description: Desired response format
+  urir:
+    type: string
+    description: The original resource URI
+    examples:
+      home: http://example.org
+      https: https://www.example.org/
+      noproto: example.org
+      path: http://example.org/index.html
+      missing: http://example.org/not/present
+/timemap/{format}/{urir}:
+  description: TimeMap of a URI-R in the specified format
+  uriParameters:
+    format:
+      type: format
+    urir:
+      type: urir
+  get:
+    responses:
+      200:
+        headers:
+          X-Generator:
+            description: Name and version of MemGator
+            example: MemGator:1.0
+          X-Memento-Count:
+            type: integer
+            description: Number of Mementos in the TimeMap
+            example: 10
+        body:
+          application/link-format:
+            example: !include examples/timemap.link

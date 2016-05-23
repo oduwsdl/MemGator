@@ -1,0 +1,7 @@
+# Notes to build 
+# cd $GOPATH
+# docker run --rm -it -v "$PWD":/go golang go install github.com/oduwsdl/memgator
+# docker run --rm -v "$PWD":/go golang memgator server
+# docker run --rm -it -v "$PWD":/go -v /data/MemGator/mgbins:/tmp/mgbins golang bash
+# cd src/github.com/oduwsdl/memgator
+# ./crossbuild.sh

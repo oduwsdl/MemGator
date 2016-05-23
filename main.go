@@ -183,14 +183,19 @@ func splitLinks(lnkrcvd chan string, lnksplt chan string) {
 	lnkstr := <-lnkrcvd
 	strlen := len(lnkstr)
 	q := false
+	u := false
 	i := 0
 	j := 0
 	for ; j < strlen; j++ {
 		switch lnkstr[j] {
 		case '"':
 			q = !q
+		case '<':
+			u = true
+		case '>':
+			u = false
 		case ',':
-			if !q {
+			if !q && !u {
 				lnksplt <- lnkstr[i:j]
 				i = j + 1
 			}
