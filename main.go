@@ -299,7 +299,7 @@ func fetchTimemap(urir string, arch *Archive, tmCh chan *list.List, wg *sync.Wai
 	arch.Failures = 0
 	defer res.Body.Close()
 	if res.StatusCode != http.StatusOK && res.StatusCode != http.StatusFound {
-		benchmarker(arch.ID, "timemapfetch", fmt.Sprintf("Response error in %s, Stutus: %d", arch.Name, res.StatusCode), start, sess)
+		benchmarker(arch.ID, "timemapfetch", fmt.Sprintf("Response error in %s, Status: %d", arch.Name, res.StatusCode), start, sess)
 		logInfo.Printf("%s => Response error: %s", arch.ID, res.Status)
 		return
 	}
