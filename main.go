@@ -47,16 +47,18 @@ var (
 	transport    http.Transport
 	client       http.Client
 	broker       *sse.Broker
+	baseURL      string
 )
 
 var format = flag.String([]string{"f", "-format"}, "Link", "Output format - Link/JSON/CDXJ")
 var arcsloc = flag.String([]string{"a", "-arcs"}, "http://git.io/archives", "Local/remote JSON file path/URL for list of archives")
-var logfile = flag.String([]string{"l", "-log"}, "", "Log file location - Defaults to STDERR")
-var benchmark = flag.String([]string{"b", "-benchmark", "#P", "#-profile"}, "", "Benchmark file location - Defaults to Logfile")
-var contact = flag.String([]string{"c", "-contact"}, "@WebSciDL", "Email/URL/Twitter handle - Used in the user-agent")
+var logfile = flag.String([]string{"l", "-log"}, "", "Log file location - defaults to STDERR")
+var benchmark = flag.String([]string{"b", "-benchmark"}, "", "Benchmark file location - Defaults to Logfile")
+var contact = flag.String([]string{"c", "-contact"}, "@WebSciDL", "Email/URL/Twitter handle - used in the user-agent")
 var agent = flag.String([]string{"A", "-agent"}, fmt.Sprintf("%s:%s <{CONTACT}>", Name, Version), "User-agent string sent to archives")
 var host = flag.String([]string{"H", "-host"}, "localhost", "Host name - only used in web service mode")
-var servicebase = flag.String([]string{"s", "-service"}, "http://{HOST}[:{PORT}]", "Service base URL - default based on host & port")
+var proxy = flag.String([]string{"P", "-proxy"}, "http://{HOST}[:{PORT}]{ROOT}", "Proxy URL - defaults to host, port, and root")
+var root = flag.String([]string{"R", "-root"}, "/", "Service root path prefix")
 var static = flag.String([]string{"D", "-static"}, "", "Directory path to serve static assets from")
 var port = flag.Int([]string{"p", "-port"}, 1208, "Port number - only used in web service mode")
 var topk = flag.Int([]string{"k", "-topk"}, -1, "Aggregate only top k archives based on probability")
@@ -333,7 +335,7 @@ func serializeLinks(urir string, basetm *list.List, format string, dataCh chan s
 	case "link":
 		dataCh <- fmt.Sprintf(`<%s>; rel="original",`+"\n", urir)
 		if !navonly {
-			dataCh <- fmt.Sprintf(`<%s/timemap/link/%s>; rel="self"; type="application/link-format",`+"\n", *servicebase, urir)
+			dataCh <- fmt.Sprintf(`<%s/timemap/link/%s>; rel="self"; type="application/link-format",`+"\n", *proxy, urir)
 		}
 		for e := basetm.Front(); e != nil; e = e.Next() {
 			lnk := e.Value.(Link)
@@ -347,14 +349,14 @@ func serializeLinks(urir string, basetm *list.List, format string, dataCh chan s
 			}
 			dataCh <- fmt.Sprintf(`<%s>; rel="%s"; datetime="%s",`+"\n", lnk.Href, rels, lnk.Datetime)
 		}
-		dataCh <- fmt.Sprintf(`<%s/timemap/link/%s>; anchor="%s"; rel="timemap"; type="application/link-format",`+"\n", *servicebase, urir, urir)
-		dataCh <- fmt.Sprintf(`<%s/timemap/json/%s>; anchor="%s"; rel="timemap"; type="application/json",`+"\n", *servicebase, urir, urir)
-		dataCh <- fmt.Sprintf(`<%s/timemap/cdxj/%s>; anchor="%s"; rel="timemap"; type="application/cdxj+ors",`+"\n", *servicebase, urir, urir)
-		dataCh <- fmt.Sprintf(`<%s/timegate/%s>; anchor="%s"; rel="timegate"`+"\n", *servicebase, urir, urir)
+		dataCh <- fmt.Sprintf(`<%s/timemap/link/%s>; anchor="%s"; rel="timemap"; type="application/link-format",`+"\n", *proxy, urir, urir)
+		dataCh <- fmt.Sprintf(`<%s/timemap/json/%s>; anchor="%s"; rel="timemap"; type="application/json",`+"\n", *proxy, urir, urir)
+		dataCh <- fmt.Sprintf(`<%s/timemap/cdxj/%s>; anchor="%s"; rel="timemap"; type="application/cdxj+ors",`+"\n", *proxy, urir, urir)
+		dataCh <- fmt.Sprintf(`<%s/timegate/%s>; anchor="%s"; rel="timegate"`+"\n", *proxy, urir, urir)
 	case "json":
 		dataCh <- fmt.Sprintf("{\n"+`  "original_uri": "%s",`+"\n", urir)
 		if !navonly {
-			dataCh <- fmt.Sprintf(`  "self": "%s/timemap/json/%s",`+"\n", *servicebase, urir)
+			dataCh <- fmt.Sprintf(`  "self": "%s/timemap/json/%s",`+"\n", *proxy, urir)
 		}
 		dataCh <- fmt.Sprintf(`  "mementos": {` + "\n")
 		if !navonly {
@@ -383,19 +385,19 @@ func serializeLinks(urir string, basetm *list.List, format string, dataCh chan s
 		}
 		dataCh <- strings.TrimRight(navs, ",\n")
 		dataCh <- fmt.Sprintf("\n  },\n" + `  "timemap_uri": {` + "\n")
-		dataCh <- fmt.Sprintf(`    "link_format": "%s/timemap/link/%s",`+"\n", *servicebase, urir)
-		dataCh <- fmt.Sprintf(`    "json_format": "%s/timemap/json/%s",`+"\n", *servicebase, urir)
-		dataCh <- fmt.Sprintf(`    "cdxj_format": "%s/timemap/cdxj/%s"`+"\n  },\n", *servicebase, urir)
-		dataCh <- fmt.Sprintf(`  "timegate_uri": "%s/timegate/%s"`+"\n}\n", *servicebase, urir)
+		dataCh <- fmt.Sprintf(`    "link_format": "%s/timemap/link/%s",`+"\n", *proxy, urir)
+		dataCh <- fmt.Sprintf(`    "json_format": "%s/timemap/json/%s",`+"\n", *proxy, urir)
+		dataCh <- fmt.Sprintf(`    "cdxj_format": "%s/timemap/cdxj/%s"`+"\n  },\n", *proxy, urir)
+		dataCh <- fmt.Sprintf(`  "timegate_uri": "%s/timegate/%s"`+"\n}\n", *proxy, urir)
 	case "cdxj":
 		dataCh <- fmt.Sprintf(`@context ["http://tools.ietf.org/html/rfc7089"]` + "\n")
 		if !navonly {
-			dataCh <- fmt.Sprintf(`@id {"uri": "%s/timemap/cdxj/%s"}`+"\n", *servicebase, urir)
+			dataCh <- fmt.Sprintf(`@id {"uri": "%s/timemap/cdxj/%s"}`+"\n", *proxy, urir)
 		}
 		dataCh <- fmt.Sprintf(`@keys ["memento_datetime_YYYYMMDDhhmmss"]` + "\n")
 		dataCh <- fmt.Sprintf(`@meta {"original_uri": "%s"}`+"\n", urir)
-		dataCh <- fmt.Sprintf(`@meta {"timegate_uri": "%s/timegate/%s"}`+"\n", *servicebase, urir)
-		dataCh <- fmt.Sprintf(`@meta {"timemap_uri": {"link_format": "%s/timemap/link/%s", "json_format": "%s/timemap/json/%s", "cdxj_format": "%s/timemap/cdxj/%s"}`+"\n", *servicebase, urir, *servicebase, urir, *servicebase, urir)
+		dataCh <- fmt.Sprintf(`@meta {"timegate_uri": "%s/timegate/%s"}`+"\n", *proxy, urir)
+		dataCh <- fmt.Sprintf(`@meta {"timemap_uri": {"link_format": "%s/timemap/link/%s", "json_format": "%s/timemap/json/%s", "cdxj_format": "%s/timemap/cdxj/%s"}`+"\n", *proxy, urir, *proxy, urir, *proxy, urir)
 		for e := basetm.Front(); e != nil; e = e.Next() {
 			lnk := e.Value.(Link)
 			if navonly && lnk.NavRels == nil {
@@ -620,7 +622,8 @@ func router(w http.ResponseWriter, r *http.Request) {
 	var dttm *time.Time
 	var err error
 	w.Header().Set("X-Generator", Name+":"+Version)
-	requri := r.URL.RequestURI()[1:]
+	orequri := r.URL.RequestURI()
+	requri := strings.TrimPrefix(orequri, *root)
 	endpoint := strings.SplitN(requri, "/", 2)[0]
 	switch endpoint {
 	case "timemap":
@@ -674,14 +677,16 @@ func router(w http.ResponseWriter, r *http.Request) {
 		return
 	default:
 		if *static != "" {
-			http.FileServer(http.Dir(*static)).ServeHTTP(w, r)
+			logInfo.Printf("Serving static file: %s", orequri)
+			http.StripPrefix(*root, http.FileServer(http.Dir(*static))).ServeHTTP(w, r)
 			return
 		}
-		if endpoint == "" {
+		if endpoint == "" && requri != orequri {
+			logInfo.Printf("Service info printed")
 			fmt.Fprint(w, serviceInfo())
 			return
 		}
-		logInfo.Printf("Delegated to default ServerMux: %s", r.URL.RequestURI())
+		logInfo.Printf("Delegated to default ServerMux: %s", orequri)
 		http.DefaultServeMux.ServeHTTP(w, r)
 		return
 	}
@@ -711,19 +716,25 @@ func overrideFlags() {
 	if *agent == fmt.Sprintf("%s:%s <{CONTACT}>", Name, Version) {
 		*agent = fmt.Sprintf("%s:%s <%s>", Name, Version, *contact)
 	}
-	if *servicebase == "http://{HOST}[:{PORT}]" {
-		if *port == 80 {
-			*servicebase = fmt.Sprintf("http://%s", *host)
-		} else {
-			*servicebase = fmt.Sprintf("http://%s:%d", *host, *port)
-		}
+	if *root = "/" + strings.Trim(*root, "/") + "/"; *root == "//" {
+		*root = "/"
+	}
+	if *port == 80 {
+		baseURL = fmt.Sprintf("http://%s%s", *host, *root)
+	} else {
+		baseURL = fmt.Sprintf("http://%s:%d%s", *host, *port, *root)
+	}
+	if *proxy == "http://{HOST}[:{PORT}]{ROOT}" {
+		*proxy = baseURL
+	} else {
+		*proxy = strings.TrimRight(*proxy, "/")
 	}
 }
 
 func serviceInfo() (msg string) {
-	msg = fmt.Sprintf("TimeMap   : %s/timemap/{FORMAT}/{URI-R}\nTimeGate  : %s/timegate/{URI-R} [Accept-Datetime]\nMemento   : %s/memento[/{FORMAT}]/{DATETIME}/{URI-R}\n", *servicebase, *servicebase, *servicebase)
+	msg = fmt.Sprintf("TimeMap   : %s/timemap/{FORMAT}/{URI-R}\nTimeGate  : %s/timegate/{URI-R} [Accept-Datetime]\nMemento   : %s/memento[/{FORMAT}]/{DATETIME}/{URI-R}\n", baseURL, baseURL, baseURL)
 	if *monitor {
-		msg += fmt.Sprintf("Benchmark : %s/monitor [SSE]\n", *servicebase)
+		msg += fmt.Sprintf("Benchmark : %s/monitor [SSE]\n", baseURL)
 	}
 	msg += fmt.Sprintf("\n# FORMAT          => %s\n# DATETIME        => %s\n# Accept-Datetime => Header in RFC1123 format\n", responseFormats, validDatetimes)
 	return
