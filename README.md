@@ -57,7 +57,7 @@ Benchmark : http://localhost:1208/monitor [SSE]
  * If a format is not specified, it redirects to the closest Memento (to the given datetime) using the `Location` header.
 * `Benchmark` is an optional endpoint that can be enabled by the `--monitor` flag when the server is started. If enabled, it provides a stream of the benchmark log over [SSE](http://www.html5rocks.com/en/tutorials/eventsource/basics/) for realtime visualization and monitoring.
 
-**NOTE:** A fallback endpoint `/api` is added for compatibility with [Time Travel APIs](http://timetravel.mementoweb.org/guide/api/) to allow drop-in replacement in existing tools. This endpoint is an alias to to the `/memento` endpoint that returns the description of a Memento.
+**NOTE:** A fallback endpoint `/api` is added for compatibility with [Time Travel APIs](http://timetravel.mementoweb.org/guide/api/) to allow drop-in replacement in existing tools. This endpoint is an alias to the `/memento` endpoint that returns the description of a Memento.
 
 ## Download and Install
 
