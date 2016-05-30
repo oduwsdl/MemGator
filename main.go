@@ -726,9 +726,8 @@ func overrideFlags() {
 	}
 	if *proxy == "http://{HOST}[:{PORT}]{ROOT}" {
 		*proxy = baseURL
-	} else {
-		*proxy = strings.TrimRight(*proxy, "/")
 	}
+	*proxy = strings.TrimRight(*proxy, "/")
 }
 
 func serviceInfo() (msg string) {
