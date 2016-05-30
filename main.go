@@ -152,7 +152,7 @@ var regs = map[string]*regexp.Regexp{
 	"dttmstr": regexp.MustCompile(`^(\d{4})(\d{2})?(\d{2})?(\d{2})?(\d{2})?(\d{2})?$`),
 	"tmappth": regexp.MustCompile(`^timemap/(link|json|cdxj)/.+`),
 	"tgatpth": regexp.MustCompile(`^timegate/.+`),
-	"descpth": regexp.MustCompile(`^memento/(link|json|cdxj)/(\d{4})(\d{2})?(\d{2})?(\d{2})?(\d{2})?(\d{2})?/.+`),
+	"descpth": regexp.MustCompile(`^(memento|api)/(link|json|cdxj)/(\d{4})(\d{2})?(\d{2})?(\d{2})?(\d{2})?(\d{2})?/.+`),
 	"rdrcpth": regexp.MustCompile(`^memento/(\d{4})(\d{2})?(\d{2})?(\d{2})?(\d{2})?(\d{2})?/.+`),
 }
 
@@ -652,7 +652,7 @@ func router(w http.ResponseWriter, r *http.Request) {
 		} else {
 			err = fmt.Errorf("/timegate/{URI-R}")
 		}
-	case "memento":
+	case "memento", "api":
 		if regs["rdrcpth"].MatchString(requri) {
 			p := strings.SplitN(requri, "/", 3)
 			format = "redirect"

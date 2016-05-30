@@ -57,6 +57,8 @@ Benchmark : http://localhost:1208/monitor [SSE]
  * If a format is not specified, it redirects to the closest Memento (to the given datetime) using the `Location` header.
 * `Benchmark` is an optional endpoint that can be enabled by the `--monitor` flag when the server is started. If enabled, it provides a stream of the benchmark log over [SSE](http://www.html5rocks.com/en/tutorials/eventsource/basics/) for realtime visualization and monitoring.
 
+**NOTE:** A fallback endpoint `/api` is added for compatibility with [Time Travel APIs](http://timetravel.mementoweb.org/guide/api/) to allow drop-in replacement in existing tools. This endpoint is an alias to to the `/memento` endpoint that returns the description of a Memento.
+
 ## Download and Install
 
 Depending on the machine and operating system download appropriate binary from the [releases page](https://github.com/oduwsdl/memgator/releases). Change the mode of the file to executable `chmod +x MemGator-BINARY`. Run from the current location of the downloaded binary or rename it to `memgator` and move it into a directory that is in the `PATH` (such as `/usr/local/bin/`) to make it available as a command.
