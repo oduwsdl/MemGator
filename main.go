@@ -724,10 +724,12 @@ func overrideFlags() {
 	} else {
 		baseURL = fmt.Sprintf("http://%s:%d%s", *host, *port, *root)
 	}
+	baseURL = strings.TrimRight(baseURL, "/")
 	if *proxy == "http://{HOST}[:{PORT}]{ROOT}" {
 		*proxy = baseURL
+	} else {
+		*proxy = strings.TrimRight(*proxy, "/")
 	}
-	*proxy = strings.TrimRight(*proxy, "/")
 }
 
 func serviceInfo() (msg string) {
