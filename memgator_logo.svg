@@ -15,7 +15,10 @@
    id="svg3248"
    version="1.1"
    inkscape:version="0.48.4 r9939"
-   sodipodi:docname="memgator_logo.svg">
+   sodipodi:docname="memgator_logo.svg"
+   inkscape:export-filename="/home/salam/Pictures/memgator/memgator_logo.png"
+   inkscape:export-xdpi="299.96832"
+   inkscape:export-ydpi="299.96832">
   <defs
      id="defs3250">
     <linearGradient
@@ -59,15 +62,15 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.98994949"
-     inkscape:cx="442.84484"
-     inkscape:cy="339.69434"
+     inkscape:cx="322.10176"
+     inkscape:cy="450.57705"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
      inkscape:window-width="1257"
      inkscape:window-height="950"
-     inkscape:window-x="2247"
-     inkscape:window-y="124"
+     inkscape:window-x="605"
+     inkscape:window-y="41"
      inkscape:window-maximized="0"
      fit-margin-top="2"
      fit-margin-left="2"
@@ -82,7 +85,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -272,21 +275,19 @@
        sodipodi:cy="471.3035"
        sodipodi:rx="4.831038"
        sodipodi:ry="3.0620248"
-       d="m 513.6335,471.3035 a 4.831038,3.0620248 0 1 1 -9.66208,0 4.831038,3.0620248 0 1 1 9.66208,0 z"
+       d="m 513.6335,471.3035 c 0,1.69111 -2.16293,3.06202 -4.83104,3.06202 -2.66811,0 -4.83104,-1.37091 -4.83104,-3.06202 0,-1.69111 2.16293,-3.06203 4.83104,-3.06203 2.66811,0 4.83104,1.37092 4.83104,3.06203 z"
        transform="matrix(1.0824392,-0.4912017,0.51589613,0.86339597,-259.42121,296.67362)" />
     <text
        xml:space="preserve"
        style="font-size:46.83566666px;font-style:normal;font-variant:normal;font-weight:900;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#cccccc;fill-opacity:1;stroke:none;font-family:Orbitron;-inkscape-font-specification:Orbitron Heavy"
-       x="118.6666"
-       y="267.69061"
+       x="128.6666"
+       y="251.69061"
        id="text3024"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan3026"
-         x="118.6666"
-         y="267.69061"
-         style="font-size:87.81686401px;font-style:normal;font-variant:normal;font-weight:900;font-stretch:normal;font-family:Orbitron;-inkscape-font-specification:Orbitron Heavy">MemGa<tspan
-   style="font-size:81.96240234px;font-style:normal;font-variant:normal;font-weight:900;font-stretch:normal;font-family:Orbitron;-inkscape-font-specification:Orbitron Heavy"
-   id="tspan3022">t</tspan>or</tspan></text>
+         x="128.6666"
+         y="251.69061"
+         style="font-size:72px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Sarina;-inkscape-font-specification:Sarina">MemGator</tspan></text>
   </g>
 </svg>
