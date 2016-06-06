@@ -18,7 +18,8 @@
     "name": "PastPages Web Archive",
     "timemap": "http://www.pastpages.org/timemap/link/",
     "timegate": "http://www.pastpages.org/timegate/",
-    "probability": 0.001
+    "probability": 0.001,
+    "ignore": true
   },
   {
     "id": "ba",
@@ -33,7 +34,7 @@
     "name": "UK Web Archive",
     "timemap": "http://www.webarchive.org.uk/wayback/archive/timemap/link/",
     "timegate": "http://www.webarchive.org.uk/wayback/archive/",
-    "probability": 0.2
+    "probability": 0.1
   },
   {
     "id": "loc",
@@ -82,5 +83,12 @@
     "timemap": "https://swap.stanford.edu/timemap/link/",
     "timegate": "https://swap.stanford.edu/",
     "probability": 0.001
+  },
+  {
+    "id": "pt",
+    "name": "Portuguese Web Archive",
+    "timemap": "http://arquivo.pt/wayback/timemap/*/",
+    "timegate": "http://arquivo.pt/wayback/",
+    "probability": 0.1
   }
 ]
