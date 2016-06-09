@@ -555,7 +555,11 @@ func memgatorCli(urir string, format string, dttmp *time.Time) {
 	start := time.Now()
 	sess := new(Session)
 	sess.Start = start
-	defer benchmarker("SESSION", "session", "Complete session", start, sess)
+	upsession := "timemap"
+	if dttmp != nil {
+		upsession = "timegate"
+	}
+	defer benchmarker("SESSION", upsession, "Complete session", start, sess)
 	benchmarker("AGGREGATOR", "createsess", "Session created", start, sess)
 	logInfo.Printf("Aggregating Mementos for %s", urir)
 	basetm := aggregateTimemap(urir, dttmp, sess)
