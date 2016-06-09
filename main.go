@@ -791,7 +791,6 @@ func initNetwork() {
 	transport = http.Transport{
 		Dial: (&net.Dialer{
 			Timeout:   *contimeout,
-			KeepAlive: *restimeout,
 		}).Dial,
 		ResponseHeaderTimeout: *hdrtimeout,
 	}
