@@ -495,9 +495,9 @@ func benchmarker(origin string, role string, info string, start time.Time, sess 
 	end := time.Now()
 	begin := sess.Start.UnixNano()
 	info += fmt.Sprintf(" - Duration: %v", end.Sub(start))
-	logBenchmark.Printf(`%d {"origin": "%s", "role": "%s", "info": "%s", "start": %d, "end": %d}`, begin, origin, role, info, start.UnixNano()-begin, end.UnixNano()-begin)
+	logBenchmark.Printf(`%d {"origin": "%s", "role": "%s", "info": "%s", "start": %d, "end": %d}`, begin, origin, role, info, start.UnixNano(), end.UnixNano())
 	if *monitor {
-		event := fmt.Sprintf(`{"session": "%d", "origin": "%s", "role": "%s", "info": "%s", "start": %d, "end": %d}`, begin, origin, role, info, start.UnixNano()-begin, end.UnixNano()-begin)
+		event := fmt.Sprintf(`{"session": "%d", "origin": "%s", "role": "%s", "info": "%s", "start": %d, "end": %d}`, begin, origin, role, info, start.UnixNano(), end.UnixNano())
 		broker.Notifier <- []byte(event)
 	}
 }
