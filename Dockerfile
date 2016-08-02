@@ -1,4 +1,4 @@
-FROM golang
+FROM golang:1.7
 MAINTAINER Sawood Alam <ibnesayeed@gmail.com>
 
 COPY . /go/src/github.com/oduwsdl/memgator
