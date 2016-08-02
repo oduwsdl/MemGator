@@ -797,10 +797,13 @@ func initLoggers() {
 
 func initNetwork() {
 	transport = http.Transport{
-		Dial: (&net.Dialer{
-			Timeout:   *contimeout,
-		}).Dial,
+		DialContext: (&net.Dialer{
+			Timeout: *contimeout,
+			KeepAlive: *restimeout,
+		}).DialContext,
 		ResponseHeaderTimeout: *hdrtimeout,
+		MaxIdleConnsPerHost: 5,
+		IdleConnTimeout: *restimeout,
 	}
 	client = http.Client{
 		Transport: &transport,
