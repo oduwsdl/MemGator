@@ -23,7 +23,7 @@ import (
 // Name consts need explanation, TODO
 const (
 	Name    = "MemGator"
-	Version = "1.0-rc5"
+	Version = "1.0-rc6"
 	Art     = `
    _____                  _______       __
   /     \  _____  _____  / _____/______/  |___________
