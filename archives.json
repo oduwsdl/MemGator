@@ -90,5 +90,12 @@
     "timemap": "http://arquivo.pt/wayback/timemap/*/",
     "timegate": "http://arquivo.pt/wayback/",
     "probability": 0.1
+  },
+  {
+    "id": "perma",
+    "name": "Perma Archive",
+    "timemap": "http://perma-archives.org/warc/timemap/*/",
+    "timegate": "http://perma-archives.org/warc/timegate/",
+    "probability": 0.1
   }
 ]
