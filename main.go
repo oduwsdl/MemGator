@@ -11,6 +11,7 @@ import (
 	"math/rand"
 	"net"
 	"net/http"
+	"net/http/httputil"
 	"net/url"
 	"os"
 	"regexp"
@@ -47,6 +48,7 @@ var (
 	transport    http.Transport
 	client       http.Client
 	broker       *sse.Broker
+	reverseProxy *httputil.ReverseProxy
 	baseURL      string
 )
 
@@ -149,10 +151,11 @@ var regs = map[string]*regexp.Regexp{
 	"attrdlm": regexp.MustCompile(`\s*>?"?\s*;\s*`),
 	"kvaldlm": regexp.MustCompile(`\s*=\s*"?\s*`),
 	"memento": regexp.MustCompile(`\bmemento\b`),
+	"memdttm": regexp.MustCompile(`/(\d{14})/`),
 	"dttmstr": regexp.MustCompile(`^(\d{4})(\d{2})?(\d{2})?(\d{2})?(\d{2})?(\d{2})?$`),
 	"tmappth": regexp.MustCompile(`^timemap/(link|json|cdxj)/.+`),
 	"tgatpth": regexp.MustCompile(`^timegate/.+`),
-	"descpth": regexp.MustCompile(`^(memento|api)/(link|json|cdxj)/(\d{4})(\d{2})?(\d{2})?(\d{2})?(\d{2})?(\d{2})?/.+`),
+	"descpth": regexp.MustCompile(`^(memento|api)/(link|json|cdxj|proxy)/(\d{4})(\d{2})?(\d{2})?(\d{2})?(\d{2})?(\d{2})?/.+`),
 	"rdrcpth": regexp.MustCompile(`^memento/(\d{4})(\d{2})?(\d{2})?(\d{2})?(\d{2})?(\d{2})?/.+`),
 }
 
@@ -601,6 +604,17 @@ func memgatorService(w http.ResponseWriter, r *http.Request, urir string, format
 		http.Redirect(w, r, closest, http.StatusFound)
 		return
 	}
+	if format == "proxy" {
+		nr, err := http.NewRequest(http.MethodGet, closest, nil)
+		if err != nil {
+			logError.Printf("Error creating proxy request (%s): %v", closest, err)
+			http.Error(w, "Error creating proxy request for "+closest, http.StatusInternalServerError)
+			return
+		}
+		logInfo.Printf("Serving as proxy for: %s", closest)
+		reverseProxy.ServeHTTP(w, nr)
+		return
+	}
 	dataCh := make(chan string, 1)
 	if format == "timegate" {
 		go serializeLinks(urir, basetm, "link", dataCh, navonly, sess)
@@ -672,7 +686,7 @@ func router(w http.ResponseWriter, r *http.Request) {
 			rawdtm = p[2]
 			rawuri = p[3]
 		} else {
-			err = fmt.Errorf("/memento[/{FORMAT}]/{DATETIME}/{URI-R} (FORMAT => %s, DATETIME => %s)", responseFormats, validDatetimes)
+			err = fmt.Errorf("/memento[/{FORMAT}|proxy]/{DATETIME}/{URI-R} (FORMAT => %s, DATETIME => %s)", responseFormats, validDatetimes)
 		}
 	case "monitor":
 		if *monitor {
@@ -798,16 +812,23 @@ func initLoggers() {
 func initNetwork() {
 	transport = http.Transport{
 		DialContext: (&net.Dialer{
-			Timeout: *contimeout,
+			Timeout:   *contimeout,
 			KeepAlive: *restimeout,
 		}).DialContext,
 		ResponseHeaderTimeout: *hdrtimeout,
-		MaxIdleConnsPerHost: 5,
-		IdleConnTimeout: *restimeout,
+		IdleConnTimeout:       *restimeout,
+		MaxIdleConnsPerHost:   5,
 	}
 	client = http.Client{
 		Transport: &transport,
 		Timeout:   *restimeout,
+	}
+	reverseProxy = &httputil.ReverseProxy{
+		Transport:     &transport,
+		FlushInterval: time.Duration(100*time.Millisecond),
+		Director: func(r *http.Request) {
+			r.URL.Path = regs["memdttm"].ReplaceAllString(r.URL.Path, "/${1}id_/")
+		},
 	}
 }
 

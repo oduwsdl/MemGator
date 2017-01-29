@@ -42,7 +42,7 @@ When run as a Web Service, MemGator exposes following customizable endpoints:
 $ memgator [options] server
 TimeMap   : http://localhost:1208/timemap/{FORMAT}/{URI-R}
 TimeGate  : http://localhost:1208/timegate/{URI-R} [Accept-Datetime]
-Memento   : http://localhost:1208/memento[/{FORMAT}]/{DATETIME}/{URI-R}
+Memento   : http://localhost:1208/memento[/{FORMAT}|proxy]/{DATETIME}/{URI-R}
 Benchmark : http://localhost:1208/monitor [SSE]
 
 # FORMAT          => link|json|cdxj
@@ -52,9 +52,10 @@ Benchmark : http://localhost:1208/monitor [SSE]
 
 * `TimeMap` endpoint serves an aggregated TimeMap for a given URI-R in accordance with the [Memento RFC](http://tools.ietf.org/html/rfc7089). Additionally, it makes sure that the Mementos are chronologically ordered. It also provides the TimeMap data serialized in additional experimental formats.
 * `TimeGate` endpoint allows datetime negotiation via the `Accept-Datetime` header in accordance with the [Memento RFC](http://tools.ietf.org/html/rfc7089). A successful response redirects to the closes Memento (to the given datetime) using the `Location` header. The default datetime is the current time. A successful response also includes a `Link` header which provides links to the first, last, next, and previous Mementos.
-* `Memento` endpoint allows datetime negotiation in the request URL itself for clients that cannot easily send custom request headers (as opposed to the `TimeGate` which requires the `Accept-Datetime` header). This endpoint behaves differently based on whether the `format` was specified in the request. It essentially splits the functionality of the `TimeGate` endpoint in two parts as follows:
+* `Memento` endpoint allows datetime negotiation in the request URL itself for clients that cannot easily send custom request headers (as opposed to the `TimeGate` which requires the `Accept-Datetime` header). This endpoint behaves differently based on whether the `format` was specified in the request. It essentially splits the functionality of the `TimeGate` endpoint as follows:
  * If a format is specified, it returns the description of the closest Memento (to the given datetime) in the specified format. It is essentially the same data that is available in the `Link` header of the `TimeGate` response, but as the payload in the format requested by the client.
  * If a format is not specified, it redirects to the closest Memento (to the given datetime) using the `Location` header.
+ * If the term `proxy` is used instead of a format then it acts like a proxy for the closest original unmodified Memento with added CORS headers.
 * `Benchmark` is an optional endpoint that can be enabled by the `--monitor` flag when the server is started. If enabled, it provides a stream of the benchmark log over [SSE](http://www.html5rocks.com/en/tutorials/eventsource/basics/) for realtime visualization and monitoring.
 
 **NOTE:** A fallback endpoint `/api` is added for compatibility with [Time Travel APIs](http://timetravel.mementoweb.org/guide/api/#memento-json) to allow drop-in replacement in existing tools. This endpoint is an alias to the `/memento` endpoint that returns the description of a Memento.
