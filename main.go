@@ -864,6 +864,9 @@ func main() {
 	if target == "server" {
 		fmt.Printf(appInfo())
 		fmt.Printf(serviceInfo())
+		if *agent == fmt.Sprintf("%s:%s <@WebSciDL>", Name, Version) && !*spoof {
+			fmt.Printf("\nATTENTION: Please consider customizing the contact handle or the user-agent!\n")
+		}
 		if *monitor {
 			broker = sse.NewServer()
 		}
