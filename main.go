@@ -352,10 +352,10 @@ func serializeLinks(urir string, basetm *list.List, format string, dataCh chan s
 			}
 			dataCh <- fmt.Sprintf(`<%s>; rel="%s"; datetime="%s",`+"\n", lnk.Href, rels, lnk.Datetime)
 		}
-		dataCh <- fmt.Sprintf(`<%s/timemap/link/%s>; anchor="%s"; rel="timemap"; type="application/link-format",`+"\n", *proxy, urir, urir)
-		dataCh <- fmt.Sprintf(`<%s/timemap/json/%s>; anchor="%s"; rel="timemap"; type="application/json",`+"\n", *proxy, urir, urir)
-		dataCh <- fmt.Sprintf(`<%s/timemap/cdxj/%s>; anchor="%s"; rel="timemap"; type="application/cdxj+ors",`+"\n", *proxy, urir, urir)
-		dataCh <- fmt.Sprintf(`<%s/timegate/%s>; anchor="%s"; rel="timegate"`+"\n", *proxy, urir, urir)
+		dataCh <- fmt.Sprintf(`<%s/timemap/link/%s>; rel="timemap"; type="application/link-format",`+"\n", *proxy, urir)
+		dataCh <- fmt.Sprintf(`<%s/timemap/json/%s>; rel="timemap"; type="application/json",`+"\n", *proxy, urir)
+		dataCh <- fmt.Sprintf(`<%s/timemap/cdxj/%s>; rel="timemap"; type="application/cdxj+ors",`+"\n", *proxy, urir)
+		dataCh <- fmt.Sprintf(`<%s/timegate/%s>; rel="timegate"`+"\n", *proxy, urir)
 	case "json":
 		dataCh <- fmt.Sprintf("{\n"+`  "original_uri": "%s",`+"\n", urir)
 		if !navonly {
