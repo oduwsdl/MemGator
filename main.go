@@ -755,7 +755,7 @@ func overrideFlags() {
 }
 
 func serviceInfo() (msg string) {
-	msg = fmt.Sprintf("TimeMap   : %s/timemap/{FORMAT}/{URI-R}\nTimeGate  : %s/timegate/{URI-R} [Accept-Datetime]\nMemento   : %s/memento[/{FORMAT}]/{DATETIME}/{URI-R}\n", baseURL, baseURL, baseURL)
+	msg = fmt.Sprintf("TimeMap   : %s/timemap/{FORMAT}/{URI-R}\nTimeGate  : %s/timegate/{URI-R} [Accept-Datetime]\nMemento   : %s/memento[/{FORMAT}|proxy]/{DATETIME}/{URI-R}\n", baseURL, baseURL, baseURL)
 	if *monitor {
 		msg += fmt.Sprintf("Benchmark : %s/monitor [SSE]\n", baseURL)
 	}
@@ -865,7 +865,7 @@ func main() {
 		fmt.Printf(appInfo())
 		fmt.Printf(serviceInfo())
 		if *agent == fmt.Sprintf("%s:%s <@WebSciDL>", Name, Version) && !*spoof {
-			fmt.Printf("\nATTENTION: Please consider customizing the contact handle or the user-agent!\n")
+			fmt.Printf("\nATTENTION: Please consider customizing the contact info or the whole user-agent!\nCurrent user-agent: %s\nCheck CLI help (memgator --help) for options.\n", *agent)
 		}
 		if *monitor {
 			broker = sse.NewServer()
