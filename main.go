@@ -393,14 +393,14 @@ func serializeLinks(urir string, basetm *list.List, format string, dataCh chan s
 		dataCh <- fmt.Sprintf(`    "cdxj_format": "%s/timemap/cdxj/%s"`+"\n  },\n", *proxy, urir)
 		dataCh <- fmt.Sprintf(`  "timegate_uri": "%s/timegate/%s"`+"\n}\n", *proxy, urir)
 	case "cdxj":
-		dataCh <- fmt.Sprintf(`@context ["http://tools.ietf.org/html/rfc7089"]` + "\n")
+		dataCh <- fmt.Sprintf(`!context ["http://tools.ietf.org/html/rfc7089"]` + "\n")
 		if !navonly {
-			dataCh <- fmt.Sprintf(`@id {"uri": "%s/timemap/cdxj/%s"}`+"\n", *proxy, urir)
+			dataCh <- fmt.Sprintf(`!id {"uri": "%s/timemap/cdxj/%s"}`+"\n", *proxy, urir)
 		}
-		dataCh <- fmt.Sprintf(`@keys ["memento_datetime_YYYYMMDDhhmmss"]` + "\n")
-		dataCh <- fmt.Sprintf(`@meta {"original_uri": "%s"}`+"\n", urir)
-		dataCh <- fmt.Sprintf(`@meta {"timegate_uri": "%s/timegate/%s"}`+"\n", *proxy, urir)
-		dataCh <- fmt.Sprintf(`@meta {"timemap_uri": {"link_format": "%s/timemap/link/%s", "json_format": "%s/timemap/json/%s", "cdxj_format": "%s/timemap/cdxj/%s"}}`+"\n", *proxy, urir, *proxy, urir, *proxy, urir)
+		dataCh <- fmt.Sprintf(`!keys ["memento_datetime_YYYYMMDDhhmmss"]` + "\n")
+		dataCh <- fmt.Sprintf(`!meta {"original_uri": "%s"}`+"\n", urir)
+		dataCh <- fmt.Sprintf(`!meta {"timegate_uri": "%s/timegate/%s"}`+"\n", *proxy, urir)
+		dataCh <- fmt.Sprintf(`!meta {"timemap_uri": {"link_format": "%s/timemap/link/%s", "json_format": "%s/timemap/json/%s", "cdxj_format": "%s/timemap/cdxj/%s"}}`+"\n", *proxy, urir, *proxy, urir, *proxy, urir)
 		for e := basetm.Front(); e != nil; e = e.Next() {
 			lnk := e.Value.(Link)
 			if navonly && lnk.NavRels == nil {
