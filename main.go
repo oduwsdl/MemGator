@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"container/list"
 	"encoding/json"
 	"fmt"
@@ -330,15 +331,16 @@ func fetchTimemap(urir string, arch *Archive, tmCh chan *list.List, wg *sync.Wai
 	logInfo.Printf("%s => Success: %d mementos", arch.ID, tml.Len())
 }
 
-func serializeLinks(urir string, basetm *list.List, format string, dataCh chan string, navonly bool, sess *Session) {
+func serializeLinks(urir string, basetm *list.List, format string, dataCh chan fmt.Stringer, navonly bool, sess *Session) {
 	start := time.Now()
 	defer benchmarker("AGGREGATOR", "serialize", fmt.Sprintf("%d mementos serialized", basetm.Len()), start, sess)
 	defer close(dataCh)
 	switch strings.ToLower(format) {
 	case "link":
-		dataCh <- fmt.Sprintf(`<%s>; rel="original",`+"\n", urir)
+		buf := bytes.NewBuffer(nil)
+		buf.WriteString(fmt.Sprintf(`<%s>; rel="original",`+"\n", urir))
 		if !navonly {
-			dataCh <- fmt.Sprintf(`<%s/timemap/link/%s>; rel="self"; type="application/link-format",`+"\n", *proxy, urir)
+			buf.WriteString(fmt.Sprintf(`<%s/timemap/link/%s>; rel="self"; type="application/link-format",`+"\n", *proxy, urir))
 		}
 		for e := basetm.Front(); e != nil; e = e.Next() {
 			lnk := e.Value.(Link)
@@ -350,20 +352,22 @@ func serializeLinks(urir string, basetm *list.List, format string, dataCh chan s
 				rels = strings.Join(lnk.NavRels, " ") + " " + rels
 				rels = strings.Replace(rels, "closest ", "", -1)
 			}
-			dataCh <- fmt.Sprintf(`<%s>; rel="%s"; datetime="%s",`+"\n", lnk.Href, rels, lnk.Datetime)
+			buf.WriteString(fmt.Sprintf(`<%s>; rel="%s"; datetime="%s",`+"\n", lnk.Href, rels, lnk.Datetime))
 		}
-		dataCh <- fmt.Sprintf(`<%s/timemap/link/%s>; rel="timemap"; type="application/link-format",`+"\n", *proxy, urir)
-		dataCh <- fmt.Sprintf(`<%s/timemap/json/%s>; rel="timemap"; type="application/json",`+"\n", *proxy, urir)
-		dataCh <- fmt.Sprintf(`<%s/timemap/cdxj/%s>; rel="timemap"; type="application/cdxj+ors",`+"\n", *proxy, urir)
-		dataCh <- fmt.Sprintf(`<%s/timegate/%s>; rel="timegate"`+"\n", *proxy, urir)
+		buf.WriteString(fmt.Sprintf(`<%s/timemap/link/%s>; rel="timemap"; type="application/link-format",`+"\n", *proxy, urir))
+		buf.WriteString(fmt.Sprintf(`<%s/timemap/json/%s>; rel="timemap"; type="application/json",`+"\n", *proxy, urir))
+		buf.WriteString(fmt.Sprintf(`<%s/timemap/cdxj/%s>; rel="timemap"; type="application/cdxj+ors",`+"\n", *proxy, urir))
+		buf.WriteString(fmt.Sprintf(`<%s/timegate/%s>; rel="timegate"`+"\n", *proxy, urir))
+		dataCh <- buf
 	case "json":
-		dataCh <- fmt.Sprintf("{\n"+`  "original_uri": "%s",`+"\n", urir)
+		buf := bytes.NewBuffer(nil)
+		buf.WriteString(fmt.Sprintf("{\n"+`  "original_uri": "%s",`+"\n", urir))
 		if !navonly {
-			dataCh <- fmt.Sprintf(`  "self": "%s/timemap/json/%s",`+"\n", *proxy, urir)
+			buf.WriteString(fmt.Sprintf(`  "self": "%s/timemap/json/%s",`+"\n", *proxy, urir))
 		}
-		dataCh <- fmt.Sprintf(`  "mementos": {` + "\n")
+		buf.WriteString(fmt.Sprintf(`  "mementos": {` + "\n"))
 		if !navonly {
-			dataCh <- `    "list": [` + "\n"
+			buf.WriteString(`    "list": [` + "\n")
 		}
 		navs := ""
 		for e := basetm.Front(); e != nil; e = e.Next() {
@@ -377,30 +381,32 @@ func serializeLinks(urir string, basetm *list.List, format string, dataCh chan s
 				}
 			}
 			if !navonly {
-				dataCh <- fmt.Sprintf(`      {`+"\n"+`        "datetime": "%s",`+"\n"+`        "uri": "%s"`+"\n      }", lnk.Timeobj.Format(time.RFC3339), lnk.Href)
+				buf.WriteString(fmt.Sprintf(`      {`+"\n"+`        "datetime": "%s",`+"\n"+`        "uri": "%s"`+"\n      }", lnk.Timeobj.Format(time.RFC3339), lnk.Href))
 				if e.Next() != nil {
-					dataCh <- ",\n"
+					buf.WriteString(",\n")
 				}
 			}
 		}
 		if !navonly {
-			dataCh <- "\n    ],\n"
+			buf.WriteString("\n    ],\n")
 		}
-		dataCh <- strings.TrimRight(navs, ",\n")
-		dataCh <- fmt.Sprintf("\n  },\n" + `  "timemap_uri": {` + "\n")
-		dataCh <- fmt.Sprintf(`    "link_format": "%s/timemap/link/%s",`+"\n", *proxy, urir)
-		dataCh <- fmt.Sprintf(`    "json_format": "%s/timemap/json/%s",`+"\n", *proxy, urir)
-		dataCh <- fmt.Sprintf(`    "cdxj_format": "%s/timemap/cdxj/%s"`+"\n  },\n", *proxy, urir)
-		dataCh <- fmt.Sprintf(`  "timegate_uri": "%s/timegate/%s"`+"\n}\n", *proxy, urir)
+		buf.WriteString(strings.TrimRight(navs, ",\n"))
+		buf.WriteString(fmt.Sprintf("\n  },\n" + `  "timemap_uri": {` + "\n"))
+		buf.WriteString(fmt.Sprintf(`    "link_format": "%s/timemap/link/%s",`+"\n", *proxy, urir))
+		buf.WriteString(fmt.Sprintf(`    "json_format": "%s/timemap/json/%s",`+"\n", *proxy, urir))
+		buf.WriteString(fmt.Sprintf(`    "cdxj_format": "%s/timemap/cdxj/%s"`+"\n  },\n", *proxy, urir))
+		buf.WriteString(fmt.Sprintf(`  "timegate_uri": "%s/timegate/%s"`+"\n}\n", *proxy, urir))
+		dataCh <- buf
 	case "cdxj":
-		dataCh <- fmt.Sprintf(`!context ["http://tools.ietf.org/html/rfc7089"]` + "\n")
+		buf := bytes.NewBuffer(nil)
+		buf.WriteString(fmt.Sprintf(`!context ["http://tools.ietf.org/html/rfc7089"]` + "\n"))
 		if !navonly {
-			dataCh <- fmt.Sprintf(`!id {"uri": "%s/timemap/cdxj/%s"}`+"\n", *proxy, urir)
+			buf.WriteString(fmt.Sprintf(`!id {"uri": "%s/timemap/cdxj/%s"}`+"\n", *proxy, urir))
 		}
-		dataCh <- fmt.Sprintf(`!keys ["memento_datetime_YYYYMMDDhhmmss"]` + "\n")
-		dataCh <- fmt.Sprintf(`!meta {"original_uri": "%s"}`+"\n", urir)
-		dataCh <- fmt.Sprintf(`!meta {"timegate_uri": "%s/timegate/%s"}`+"\n", *proxy, urir)
-		dataCh <- fmt.Sprintf(`!meta {"timemap_uri": {"link_format": "%s/timemap/link/%s", "json_format": "%s/timemap/json/%s", "cdxj_format": "%s/timemap/cdxj/%s"}}`+"\n", *proxy, urir, *proxy, urir, *proxy, urir)
+		buf.WriteString(fmt.Sprintf(`!keys ["memento_datetime_YYYYMMDDhhmmss"]` + "\n"))
+		buf.WriteString(fmt.Sprintf(`!meta {"original_uri": "%s"}`+"\n", urir))
+		buf.WriteString(fmt.Sprintf(`!meta {"timegate_uri": "%s/timegate/%s"}`+"\n", *proxy, urir))
+		buf.WriteString(fmt.Sprintf(`!meta {"timemap_uri": {"link_format": "%s/timemap/link/%s", "json_format": "%s/timemap/json/%s", "cdxj_format": "%s/timemap/cdxj/%s"}}`+"\n", *proxy, urir, *proxy, urir, *proxy, urir))
 		for e := basetm.Front(); e != nil; e = e.Next() {
 			lnk := e.Value.(Link)
 			if navonly && lnk.NavRels == nil {
@@ -410,10 +416,11 @@ func serializeLinks(urir string, basetm *list.List, format string, dataCh chan s
 			if lnk.NavRels != nil {
 				rels = strings.Join(lnk.NavRels, " ") + " " + rels
 			}
-			dataCh <- fmt.Sprintf(`%s {"uri": "%s", "rel": "%s", "datetime": "%s"}`+"\n", lnk.Timestr, lnk.Href, rels, lnk.Datetime)
+			buf.WriteString(fmt.Sprintf(`%s {"uri": "%s", "rel": "%s", "datetime": "%s"}`+"\n", lnk.Timestr, lnk.Href, rels, lnk.Datetime))
 		}
+		dataCh <- buf
 	default:
-		dataCh <- fmt.Sprintf("Unrecognized format: %s\n", format)
+		dataCh <- bytes.NewBuffer([]byte(fmt.Sprintf("Unrecognized format: %s\n", format)))
 	}
 }
 
@@ -570,10 +577,10 @@ func memgatorCli(urir string, format string, dttmp *time.Time) {
 		return
 	}
 	navonly, _ := setNavRels(basetm, dttmp, sess)
-	dataCh := make(chan string, 1)
+	dataCh := make(chan fmt.Stringer, 1)
 	go serializeLinks(urir, basetm, format, dataCh, navonly, sess)
 	for dt := range dataCh {
-		fmt.Print(dt)
+		fmt.Print(dt.String())
 	}
 	logInfo.Printf("Total Mementos: %d in %s", basetm.Len(), time.Since(start))
 }
@@ -615,12 +622,12 @@ func memgatorService(w http.ResponseWriter, r *http.Request, urir string, format
 		reverseProxy.ServeHTTP(w, nr)
 		return
 	}
-	dataCh := make(chan string, 1)
+	dataCh := make(chan fmt.Stringer, 1)
 	if format == "timegate" {
 		go serializeLinks(urir, basetm, "link", dataCh, navonly, sess)
 		lnkhdr := ""
 		for dt := range dataCh {
-			lnkhdr += dt
+			lnkhdr += dt.String()
 		}
 		lnkhdr = strings.Replace(lnkhdr, "\n", " ", -1)
 		w.Header().Set("Link", lnkhdr)
@@ -634,7 +641,7 @@ func memgatorService(w http.ResponseWriter, r *http.Request, urir string, format
 		w.Header().Set("Content-Type", mime)
 	}
 	for dt := range dataCh {
-		fmt.Fprint(w, dt)
+		fmt.Fprint(w, dt.String())
 	}
 	logInfo.Printf("Total Mementos: %d in %s", basetm.Len(), time.Since(start))
 }
@@ -825,7 +832,7 @@ func initNetwork() {
 	}
 	reverseProxy = &httputil.ReverseProxy{
 		Transport:     &transport,
-		FlushInterval: time.Duration(100*time.Millisecond),
+		FlushInterval: time.Duration(100 * time.Millisecond),
 		Director: func(r *http.Request) {
 			r.URL.Path = regs["memdttm"].ReplaceAllString(r.URL.Path, "/${1}id_/")
 		},
