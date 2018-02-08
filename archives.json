@@ -90,5 +90,11 @@
     "timemap": "http://arquivo.pt/wayback/timemap/*/",
     "timegate": "http://arquivo.pt/wayback/",
     "probability": 0.1
+  },
+  {
+    "id": "nrscotland",
+    "name": "National Records of Scotland",
+    "timemap": "http://webarchive.nrscotland.gov.uk/timemap/",
+    "timegate": "http://webarchive.nrscotland.gov.uk/timegate/"
   }
 ]
