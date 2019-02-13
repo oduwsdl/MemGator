@@ -76,7 +76,7 @@ $ docker run ibnesayeed/memgator [options] {URI-R} {YYYY[MM[DD[hh[mm[ss]]]]]}
 $ docker run ibnesayeed/memgator [options] server
 ```
 
-### Full Usage
+## Full Usage
 
 ```
 MemGator {Version}
@@ -134,3 +134,29 @@ $ ./crossbuild.sh
 ```
 
 This will generate various binaries in `/tmp/mgbins` directory.
+
+## Citing Project
+
+This project was formally published in JCDL 2016 ([Read the PDF](http://www.cs.odu.edu/~mln/pubs/jcdl-2016/jcdl-2016-alam-memgator.pdf)). Please cite it as below:
+
+> Sawood Alam, Michael Nelson. __MemGator - A Portable Concurrent Memento Aggregator: Cross-Platform CLI and Server Binaries in Go__. In _Proceedings of the 16th ACM/IEEE-CS on Joint Conference on Digital Libraries, JCDL 2016_, pp. 243-244, Newark, New Jersey, USA, June 2016.
+
+```latex
+@inproceedings{jcdl-2016:alam:memgator,
+  author    = {Sawood Alam and
+               Michael L. Nelson},
+  title     = {{MemGator - A Portable Concurrent Memento Aggregator}},
+  booktitle = {Proceedings of the 16th ACM/IEEE-CS Joint Conference on Digital Libraries},
+  series    = {JCDL '16},
+  year      = {2016},
+  month     = {jun},
+  location  = {Newark, New Jersey, USA},
+  pages     = {243--244},
+  numpages  = {2},
+  url       = {http://dx.doi.org/10.1145/2910896.2925452},
+  doi       = {10.1145/2910896.2925452},
+  isbn      = {978-1-4503-4229-2},
+  publisher = {ACM},
+  address   = {New York, NY, USA}
+}
+```
