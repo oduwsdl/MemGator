@@ -92,6 +92,13 @@
     "probability": 0.1
   },
   {
+    "id": "perma",
+    "name": "Perma Archive",
+    "timemap": "https://perma-archives.org/warc/timemap/*/",
+    "timegate": "https://perma-archives.org/warc/timegate/",
+    "probability": 0.1
+  },
+  {
     "id": "nrscotland",
     "name": "National Records of Scotland",
     "timemap": "http://webarchive.nrscotland.gov.uk/timemap/",
