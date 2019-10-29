@@ -2,8 +2,8 @@
   {
     "id": "web.archive.org",
     "name": "Internet Archive",
-    "timemap": "http://web.archive.org/web/timemap/link/",
-    "timegate": "http://web.archive.org/web/",
+    "timemap": "https://web.archive.org/web/timemap/link/",
+    "timegate": "https://web.archive.org/web/",
     "probability": 0.5
   },
   {
@@ -25,22 +25,22 @@
   {
     "id": "webarchive.org.uk",
     "name": "UK Web Archive",
-    "timemap": "http://www.webarchive.org.uk/wayback/archive/timemap/link/",
-    "timegate": "http://www.webarchive.org.uk/wayback/archive/",
+    "timemap": "https://www.webarchive.org.uk/wayback/archive/timemap/link/",
+    "timegate": "https://www.webarchive.org.uk/wayback/archive/",
     "probability": 0.1
   },
   {
     "id": "webarchive.loc.gov",
     "name": "Library of Congress",
-    "timemap": "http://webarchive.loc.gov/all/timemap/link/",
-    "timegate": "http://webarchive.loc.gov/all/",
+    "timemap": "https://webarchive.loc.gov/all/timemap/link/",
+    "timegate": "https://webarchive.loc.gov/all/",
     "probability": 0.05
   },
   {
     "id": "wayback.archive-it.org",
     "name": "Archive-It",
-    "timemap": "http://wayback.archive-it.org/all/timemap/link/",
-    "timegate": "http://wayback.archive-it.org/all/",
+    "timemap": "https://wayback.archive-it.org/all/timemap/link/",
+    "timegate": "https://wayback.archive-it.org/all/",
     "probability": 0.1
   },
   {
@@ -52,15 +52,15 @@
   {
     "id": "webarchive.nationalarchives.gov",
     "name": "UK National Archives Web Archive",
-    "timemap": "http://webarchive.nationalarchives.gov.uk/timemap/",
-    "timegate": "http://webarchive.nationalarchives.gov.uk/timegate/",
+    "timemap": "https://webarchive.nationalarchives.gov.uk/timemap/",
+    "timegate": "https://webarchive.nationalarchives.gov.uk/timegate/",
     "probability": 0.04
   },
   {
     "id": "archive.today",
     "name": "archive.today",
-    "timemap": "http://archive.today/timemap/",
-    "timegate": "http://archive.today/timegate/",
+    "timemap": "https://archive.today/timemap/",
+    "timegate": "https://archive.today/timegate/",
     "probability": 0.07
   },
   {
@@ -80,8 +80,8 @@
   {
     "id": "arquivo.pt",
     "name": "Portuguese Web Archive",
-    "timemap": "http://arquivo.pt/wayback/timemap/*/",
-    "timegate": "http://arquivo.pt/wayback/",
+    "timemap": "https://arquivo.pt/wayback/timemap/*/",
+    "timegate": "https://arquivo.pt/wayback/",
     "probability": 0.1
   },
   {
@@ -94,7 +94,7 @@
   {
     "id": "webarchive.nrscotland.gov.uk",
     "name": "National Records of Scotland",
-    "timemap": "http://webarchive.nrscotland.gov.uk/timemap/",
-    "timegate": "http://webarchive.nrscotland.gov.uk/timegate/"
+    "timemap": "https://webarchive.nrscotland.gov.uk/timemap/",
+    "timegate": "https://webarchive.nrscotland.gov.uk/timegate/"
   }
 ]
