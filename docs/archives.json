@@ -1,20 +1,20 @@
 [
   {
-    "id": "ia",
+    "id": "web.archive.org",
     "name": "Internet Archive",
     "timemap": "http://web.archive.org/web/timemap/link/",
     "timegate": "http://web.archive.org/web/",
     "probability": 0.5
   },
   {
-    "id": "proni",
+    "id": "webarchive.proni.gov.uk",
     "name": "PRONI Web Archive",
     "timemap": "http://webarchive.proni.gov.uk/timemap/",
     "timegate": "http://webarchive.proni.gov.uk/timegate/",
     "probability": 0.001
   },
   {
-    "id": "pastpages",
+    "id": "pastpages.org",
     "name": "PastPages Web Archive",
     "timemap": "http://www.pastpages.org/timemap/link/",
     "timegate": "http://www.pastpages.org/timegate/",
@@ -22,7 +22,7 @@
     "ignore": true
   },
   {
-    "id": "ba",
+    "id": "web.archive.bibalex.org",
     "name": "Bibliotheca Alexandrina Web Archive",
     "timemap": "http://web.archive.bibalex.org/web/timemap/link/",
     "timegate": "http://web.archive.bibalex.org/web/",
@@ -30,76 +30,76 @@
     "ignore": true
   },
   {
-    "id": "blarchive",
+    "id": "webarchive.org.uk",
     "name": "UK Web Archive",
     "timemap": "http://www.webarchive.org.uk/wayback/archive/timemap/link/",
     "timegate": "http://www.webarchive.org.uk/wayback/archive/",
     "probability": 0.1
   },
   {
-    "id": "loc",
+    "id": "webarchive.loc.gov",
     "name": "Library of Congress",
     "timemap": "http://webarchive.loc.gov/all/timemap/link/",
     "timegate": "http://webarchive.loc.gov/all/",
     "probability": 0.05
   },
   {
-    "id": "archiveit",
+    "id": "wayback.archive-it.org",
     "name": "Archive-It",
     "timemap": "http://wayback.archive-it.org/all/timemap/link/",
     "timegate": "http://wayback.archive-it.org/all/",
     "probability": 0.1
   },
   {
-    "id": "ukparliament",
+    "id": "webarchive.parliament.uk",
     "name": "UK Parliament Web Archive",
     "timemap": "http://webarchive.parliament.uk/timemap/",
     "timegate": "http://webarchive.parliament.uk/timegate/"
   },
   {
-    "id": "uknationalarchives",
+    "id": "webarchive.nationalarchives.gov",
     "name": "UK National Archives Web Archive",
     "timemap": "http://webarchive.nationalarchives.gov.uk/timemap/",
     "timegate": "http://webarchive.nationalarchives.gov.uk/timegate/",
     "probability": 0.04
   },
   {
-    "id": "archive.is",
+    "id": "archive.today",
     "name": "archive.today",
     "timemap": "http://archive.today/timemap/",
     "timegate": "http://archive.today/timegate/",
     "probability": 0.07
   },
   {
-    "id": "is",
+    "id": "wayback.vefsafn.is",
     "name": "Icelandic Web Archive",
     "timemap": "http://wayback.vefsafn.is/wayback/timemap/link/",
     "timegate": "http://wayback.vefsafn.is/wayback/",
     "probability": 0.06
   },
   {
-    "id": "swa",
+    "id": "swap.stanford.edu",
     "name": "Stanford Web Archive",
     "timemap": "https://swap.stanford.edu/timemap/link/",
     "timegate": "https://swap.stanford.edu/",
     "probability": 0.001
   },
   {
-    "id": "pt",
+    "id": "arquivo.pt",
     "name": "Portuguese Web Archive",
     "timemap": "http://arquivo.pt/wayback/timemap/*/",
     "timegate": "http://arquivo.pt/wayback/",
     "probability": 0.1
   },
   {
-    "id": "perma",
+    "id": "perma-archives.org",
     "name": "Perma Archive",
     "timemap": "https://perma-archives.org/warc/timemap/*/",
     "timegate": "https://perma-archives.org/warc/timegate/",
     "probability": 0.1
   },
   {
-    "id": "nrscotland",
+    "id": "webarchive.nrscotland.gov.uk",
     "name": "National Records of Scotland",
     "timemap": "http://webarchive.nrscotland.gov.uk/timemap/",
     "timegate": "http://webarchive.nrscotland.gov.uk/timegate/"
