@@ -7,13 +7,6 @@
     "probability": 0.5
   },
   {
-    "id": "webarchive.proni.gov.uk",
-    "name": "PRONI Web Archive",
-    "timemap": "http://webarchive.proni.gov.uk/timemap/",
-    "timegate": "http://webarchive.proni.gov.uk/timegate/",
-    "probability": 0.001
-  },
-  {
     "id": "pastpages.org",
     "name": "PastPages Web Archive",
     "timemap": "http://www.pastpages.org/timemap/link/",
