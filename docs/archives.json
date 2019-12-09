@@ -80,7 +80,7 @@
   {
     "id": "arquivo.pt",
     "name": "Portuguese Web Archive",
-    "timemap": "https://arquivo.pt/wayback/timemap/*/",
+    "timemap": "https://arquivo.pt/wayback/timemap/link/",
     "timegate": "https://arquivo.pt/wayback/",
     "probability": 0.1
   },
