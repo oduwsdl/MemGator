@@ -85,10 +85,10 @@
     "probability": 0.1
   },
   {
-    "id": "perma-archives.org",
+    "id": "perma.cc",
     "name": "Perma Archive",
-    "timemap": "https://perma-archives.org/warc/timemap/*/",
-    "timegate": "https://perma-archives.org/warc/timegate/",
+    "timemap": "https://perma.cc/timemap/link/",
+    "timegate": "https://perma.cc/timegate/",
     "probability": 0.1
   },
   {
