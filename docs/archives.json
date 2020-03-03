@@ -1,7 +1,7 @@
 [
   {
     "id": "archive.today",
-    "name": "archive.today",
+    "name": "Archive.today",
     "timemap": "https://archive.today/timemap/",
     "timegate": "https://archive.today/timegate/"
   },
