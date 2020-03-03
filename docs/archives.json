@@ -1,70 +1,9 @@
 [
   {
-    "id": "web.archive.org",
-    "name": "Internet Archive",
-    "timemap": "https://web.archive.org/web/timemap/link/",
-    "timegate": "https://web.archive.org/web/"
-  },
-  {
-    "id": "pastpages.org",
-    "name": "PastPages Web Archive",
-    "timemap": "http://www.pastpages.org/timemap/link/",
-    "timegate": "http://www.pastpages.org/timegate/",
-    "ignore": true
-  },
-  {
-    "id": "web.archive.bibalex.org",
-    "name": "Bibliotheca Alexandrina Web Archive",
-    "timemap": "http://web.archive.bibalex.org/web/timemap/link/",
-    "timegate": "http://web.archive.bibalex.org/web/"
-  },
-  {
-    "id": "webarchive.org.uk",
-    "name": "UK Web Archive",
-    "timemap": "https://www.webarchive.org.uk/wayback/archive/timemap/link/",
-    "timegate": "https://www.webarchive.org.uk/wayback/archive/"
-  },
-  {
-    "id": "webarchive.loc.gov",
-    "name": "Library of Congress",
-    "timemap": "https://webarchive.loc.gov/all/timemap/link/",
-    "timegate": "https://webarchive.loc.gov/all/"
-  },
-  {
-    "id": "wayback.archive-it.org",
-    "name": "Archive-It",
-    "timemap": "https://wayback.archive-it.org/all/timemap/link/",
-    "timegate": "https://wayback.archive-it.org/all/"
-  },
-  {
-    "id": "webarchive.parliament.uk",
-    "name": "UK Parliament Web Archive",
-    "timemap": "http://webarchive.parliament.uk/timemap/",
-    "timegate": "http://webarchive.parliament.uk/timegate/"
-  },
-  {
-    "id": "webarchive.nationalarchives.gov",
-    "name": "UK National Archives Web Archive",
-    "timemap": "https://webarchive.nationalarchives.gov.uk/timemap/",
-    "timegate": "https://webarchive.nationalarchives.gov.uk/timegate/"
-  },
-  {
     "id": "archive.today",
     "name": "archive.today",
     "timemap": "https://archive.today/timemap/",
     "timegate": "https://archive.today/timegate/"
-  },
-  {
-    "id": "wayback.vefsafn.is",
-    "name": "Icelandic Web Archive",
-    "timemap": "http://wayback.vefsafn.is/wayback/timemap/link/",
-    "timegate": "http://wayback.vefsafn.is/wayback/"
-  },
-  {
-    "id": "swap.stanford.edu",
-    "name": "Stanford Web Archive",
-    "timemap": "https://swap.stanford.edu/timemap/link/",
-    "timegate": "https://swap.stanford.edu/"
   },
   {
     "id": "arquivo.pt",
@@ -73,15 +12,76 @@
     "timegate": "https://arquivo.pt/wayback/"
   },
   {
+    "id": "pastpages.org",
+    "name": "PastPages Web Archive [DEFUNCT]",
+    "timemap": "http://www.pastpages.org/timemap/link/",
+    "timegate": "http://www.pastpages.org/timegate/",
+    "ignore": true
+  },
+  {
     "id": "perma.cc",
     "name": "Perma Archive",
     "timemap": "https://perma.cc/timemap/link/",
     "timegate": "https://perma.cc/timegate/"
   },
   {
+    "id": "swap.stanford.edu",
+    "name": "Stanford Web Archive",
+    "timemap": "https://swap.stanford.edu/timemap/link/",
+    "timegate": "https://swap.stanford.edu/"
+  },
+  {
+    "id": "wayback.archive-it.org",
+    "name": "Archive-It",
+    "timemap": "https://wayback.archive-it.org/all/timemap/link/",
+    "timegate": "https://wayback.archive-it.org/all/"
+  },
+  {
+    "id": "wayback.vefsafn.is",
+    "name": "Icelandic Web Archive",
+    "timemap": "http://wayback.vefsafn.is/wayback/timemap/link/",
+    "timegate": "http://wayback.vefsafn.is/wayback/"
+  },
+  {
+    "id": "web.archive.bibalex.org",
+    "name": "Bibliotheca Alexandrina Web Archive",
+    "timemap": "http://web.archive.bibalex.org/web/timemap/link/",
+    "timegate": "http://web.archive.bibalex.org/web/"
+  },
+  {
+    "id": "web.archive.org",
+    "name": "Internet Archive",
+    "timemap": "https://web.archive.org/web/timemap/link/",
+    "timegate": "https://web.archive.org/web/"
+  },
+  {
+    "id": "webarchive.loc.gov",
+    "name": "Library of Congress",
+    "timemap": "https://webarchive.loc.gov/all/timemap/link/",
+    "timegate": "https://webarchive.loc.gov/all/"
+  },
+  {
+    "id": "webarchive.nationalarchives.gov",
+    "name": "UK National Archives Web Archive",
+    "timemap": "https://webarchive.nationalarchives.gov.uk/timemap/",
+    "timegate": "https://webarchive.nationalarchives.gov.uk/timegate/"
+  },
+  {
     "id": "webarchive.nrscotland.gov.uk",
     "name": "National Records of Scotland",
     "timemap": "https://webarchive.nrscotland.gov.uk/timemap/",
     "timegate": "https://webarchive.nrscotland.gov.uk/timegate/"
+  },
+  {
+    "id": "webarchive.org.uk",
+    "name": "UK Web Archive",
+    "timemap": "https://www.webarchive.org.uk/wayback/archive/timemap/link/",
+    "timegate": "https://www.webarchive.org.uk/wayback/archive/"
+  },
+  {
+    "id": "webarchive.parliament.uk",
+    "name": "UK Parliament Web Archive",
+    "timemap": "http://webarchive.parliament.uk/timemap/",
+    "timegate": "http://webarchive.parliament.uk/timegate/"
   }
 ]
