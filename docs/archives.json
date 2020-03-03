@@ -101,5 +101,12 @@
     "name": "UK Parliament Web Archive",
     "timemap": "http://webarchive.parliament.uk/timemap/",
     "timegate": "http://webarchive.parliament.uk/timegate/"
+  },
+  {
+    "id": "webarchive.proni.gov.uk",
+    "name": "PRONI Web Archive [MOVED TO A-IT]",
+    "timemap": "http://webarchive.proni.gov.uk/timemap/",
+    "timegate": "http://webarchive.proni.gov.uk/timegate/",
+    "ignore": true
   }
 ]
