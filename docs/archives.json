@@ -55,6 +55,12 @@
     "timegate": "https://web.archive.org/web/"
   },
   {
+    "id": "web.archive.org.au",
+    "name": "Australian Web Archive",
+    "timemap": "https://web.archive.org.au/awa/timemap/link/",
+    "timegate": "https://web.archive.org.au/awa/mp_/"
+  },
+  {
     "id": "webarchive.loc.gov",
     "name": "Library of Congress",
     "timemap": "https://webarchive.loc.gov/all/timemap/link/",
