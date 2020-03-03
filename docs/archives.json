@@ -67,6 +67,12 @@
     "timegate": "https://web.archive.org.au/awa/mp_/"
   },
   {
+    "id": "webarchive.bac-lac.gc.ca",
+    "name": "Library and Archives Canada",
+    "timemap": "http://webarchive.bac-lac.gc.ca:8080/wayback/timemap/link/",
+    "timegate": "http://webarchive.bac-lac.gc.ca:8080/wayback/"
+  },
+  {
     "id": "webarchive.loc.gov",
     "name": "Library of Congress",
     "timemap": "https://webarchive.loc.gov/all/timemap/link/",
