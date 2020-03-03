@@ -16,8 +16,7 @@
     "id": "web.archive.bibalex.org",
     "name": "Bibliotheca Alexandrina Web Archive",
     "timemap": "http://web.archive.bibalex.org/web/timemap/link/",
-    "timegate": "http://web.archive.bibalex.org/web/",
-    "ignore": true
+    "timegate": "http://web.archive.bibalex.org/web/"
   },
   {
     "id": "webarchive.org.uk",
