@@ -31,6 +31,12 @@
     "timegate": "https://swap.stanford.edu/"
   },
   {
+    "id": "waext.banq.qc.ca",
+    "name": "BAnQ",
+    "timemap": "https://waext.banq.qc.ca/wayback/timemap/link/",
+    "timegate": "https://waext.banq.qc.ca/wayback/"
+  },
+  {
     "id": "wayback.archive-it.org",
     "name": "Archive-It",
     "timemap": "https://wayback.archive-it.org/all/timemap/link/",
