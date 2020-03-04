@@ -927,7 +927,7 @@ func main() {
 	if target == "server" {
 		fmt.Printf(appInfo() + "\n" + serviceInfo())
 		if *agent == fmt.Sprintf("%s:%s <@WebSciDL>", Name, Version) && !*spoof {
-			fmt.Printf("\nATTENTION: Please consider customizing the contact info or the whole user-agent!\nCurrent user-agent: %s\nCheck CLI help (memgator --help) for options.\n", *agent)
+			fmt.Print("\n\nATTENTION!\nConsider customizing the contact info or the whole user-agent.\nCheck CLI help (memgator --help) for options.\n\n")
 		}
 		if *monitor {
 			broker = sse.NewServer()
