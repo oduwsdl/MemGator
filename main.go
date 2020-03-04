@@ -770,7 +770,7 @@ func serviceInfo() (msg string) {
 		if name == "" {
 			name = a.ID
 		}
-		msg += fmt.Sprintf("\n%d. [%s](https://%s/)", i + 1, name, a.ID)
+		msg += fmt.Sprintf("\n%d. [%s](https://%s/)", i+1, name, a.ID)
 		if a.Dormant {
 			msg += " - (DORMANT)"
 		} else if a.Failures > 0 {
@@ -888,7 +888,7 @@ func initNetwork() {
 	}
 	reverseProxy = &httputil.ReverseProxy{
 		Transport:     &transport,
-		FlushInterval: time.Duration(100*time.Millisecond),
+		FlushInterval: time.Duration(100 * time.Millisecond),
 		Director: func(r *http.Request) {
 			r.URL.Path = regs["memdttm"].ReplaceAllString(r.URL.Path, "/${1}id_/")
 		},
