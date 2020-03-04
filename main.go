@@ -755,11 +755,74 @@ func overrideFlags() {
 }
 
 func serviceInfo() (msg string) {
-	msg = fmt.Sprintf("TimeMap   : %s/timemap/{FORMAT}/{URI-R}\nTimeGate  : %s/timegate/{URI-R} [Accept-Datetime]\nMemento   : %s/memento[/{FORMAT}|proxy]/{DATETIME}/{URI-R}\n", baseURL, baseURL, baseURL)
-	if *monitor {
-		msg += fmt.Sprintf("Benchmark : %s/monitor [SSE]\n", baseURL)
+	msg = "## API Endpoints\n\n"
+	msg += fmt.Sprintf("TimeMap:  %s/timemap/{FORMAT}/{URI-R}\n", baseURL)
+	msg += fmt.Sprintf("TimeGate: %s/timegate/{URI-R} [Accept-Datetime]\n", baseURL)
+	msg += fmt.Sprintf("Memento:  %s/memento[/{FORMAT}|proxy]/{DATETIME}/{URI-R}\n", baseURL)
+	msg += "\n"
+	msg += fmt.Sprintf("  {FORMAT}          => %s\n", responseFormats)
+	msg += fmt.Sprintf("  {DATETIME}        => %s\n", validDatetimes)
+	msg += "  [Accept-Datetime] => Header in RFC1123 format\n"
+	msg += "\n\n"
+	msg += "## Upstream Archives\n"
+	for i, a := range archives {
+		name := a.Name
+		if name == "" {
+			name = a.ID
+		}
+		msg += fmt.Sprintf("\n%d. [%s](https://%s/)", i + 1, name, a.ID)
+		if a.Dormant {
+			msg += " - (DORMANT)"
+		} else if a.Failures > 0 {
+			msg += fmt.Sprintf(" - (Consecutive failures: %s)", a.Failures)
+		}
 	}
-	msg += fmt.Sprintf("\n# FORMAT          => %s\n# DATETIME        => %s\n# Accept-Datetime => Header in RFC1123 format\n", responseFormats, validDatetimes)
+	msg += "\n\n\n"
+	msg += "## Configs\n\n"
+	msg += fmt.Sprintf("Archives list location: %s\n", *arcsloc)
+	ua := *agent
+	if *spoof {
+		ua = "A random browser UA - (SPOOFED)"
+	}
+	msg += fmt.Sprintf("User-agent:             %s\n", ua)
+	msg += "\n"
+	msg += fmt.Sprintf("Host:                   %s\n", *host)
+	msg += fmt.Sprintf("Port:                   %d\n", *port)
+	msg += fmt.Sprintf("Service path prefix:    %s\n", *root)
+	msg += fmt.Sprintf("Base URL (Proxy):       %s/\n", *proxy)
+	if *static != "" {
+		msg += fmt.Sprintf("Static assets:          %s\n", *static)
+	}
+	msg += "\n"
+	msg += fmt.Sprintf("Connection timeout:     %s\n", *contimeout)
+	msg += fmt.Sprintf("Header timeout:         %s\n", *hdrtimeout)
+	msg += fmt.Sprintf("Response timeout:       %s\n", *restimeout)
+	msg += "\n"
+	if *tolerance != -1 {
+		msg += fmt.Sprintf("Failure tolerance:      %d\n", *tolerance)
+		msg += fmt.Sprintf("Dormant period:         %s\n", *dormant)
+	}
+	if *topk != -1 {
+		msg += fmt.Sprintf("Select top archives:    %d\n", *topk)
+	}
+	if *tolerance != -1 || *topk != -1 {
+		msg += "\n"
+	}
+	logloc := "STDERR"
+	if *logfile != "" && !*verbose {
+		logloc = *logfile
+	}
+	msg += fmt.Sprintf("Logfile location:       %s\n", logloc)
+	if *benchmark != "" && !*verbose {
+		logloc = *benchmark
+	}
+	msg += fmt.Sprintf("Benchmark location:     %s\n", logloc)
+	if *verbose {
+		msg += "Verbose info output:    STDERR\n"
+	}
+	if *monitor {
+		msg += fmt.Sprintf("Benchmark (SSE):        %s/monitor\n", baseURL)
+	}
 	return
 }
 
@@ -862,8 +925,7 @@ func main() {
 		logFatal.Fatalf("Error parsing JSON (%s): %s\n", *arcsloc, err)
 	}
 	if target == "server" {
-		fmt.Printf(appInfo())
-		fmt.Printf(serviceInfo())
+		fmt.Printf(appInfo() + "\n" + serviceInfo())
 		if *agent == fmt.Sprintf("%s:%s <@WebSciDL>", Name, Version) && !*spoof {
 			fmt.Printf("\nATTENTION: Please consider customizing the contact info or the whole user-agent!\nCurrent user-agent: %s\nCheck CLI help (memgator --help) for options.\n", *agent)
 		}
