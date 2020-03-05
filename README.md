@@ -40,29 +40,31 @@ When run as a Web Service, MemGator exposes following customizable endpoints:
 
 ```
 $ memgator [options] server
-TimeMap   : http://localhost:1208/timemap/{FORMAT}/{URI-R}
-TimeGate  : http://localhost:1208/timegate/{URI-R} [Accept-Datetime]
-Memento   : http://localhost:1208/memento[/{FORMAT}|proxy]/{DATETIME}/{URI-R}
-Benchmark : http://localhost:1208/monitor [SSE]
+TimeMap:  http://localhost:1208/timemap/{FORMAT}/{URI-R}
+TimeGate: http://localhost:1208/timegate/{URI-R} [Accept-Datetime]
+Memento:  http://localhost:1208/memento[/{FORMAT}|proxy]/{DATETIME}/{URI-R}
+About:    http://localhost:1208/about
+Monitor:  http://localhost:1208/monitor - (Over SSE, if enabled)
 
-# FORMAT          => link|json|cdxj
-# DATETIME        => YYYY[MM[DD[hh[mm[ss]]]]]
-# Accept-Datetime => Header in RFC1123 format
+  {FORMAT}          => link|json|cdxj
+  {DATETIME}        => YYYY[MM[DD[hh[mm[ss]]]]]
+  [Accept-Datetime] => Header in RFC1123 format
 ```
 
 * `TimeMap` endpoint serves an aggregated TimeMap for a given URI-R in accordance with the [Memento RFC](http://tools.ietf.org/html/rfc7089). Additionally, it makes sure that the Mementos are chronologically ordered. It also provides the TimeMap data serialized in additional experimental formats.
 * `TimeGate` endpoint allows datetime negotiation via the `Accept-Datetime` header in accordance with the [Memento RFC](http://tools.ietf.org/html/rfc7089). A successful response redirects to the closes Memento (to the given datetime) using the `Location` header. The default datetime is the current time. A successful response also includes a `Link` header which provides links to the first, last, next, and previous Mementos.
 * `Memento` endpoint allows datetime negotiation in the request URL itself for clients that cannot easily send custom request headers (as opposed to the `TimeGate` which requires the `Accept-Datetime` header). This endpoint behaves differently based on whether the `format` was specified in the request. It essentially splits the functionality of the `TimeGate` endpoint as follows:
- * If a format is specified, it returns the description of the closest Memento (to the given datetime) in the specified format. It is essentially the same data that is available in the `Link` header of the `TimeGate` response, but as the payload in the format requested by the client.
- * If a format is not specified, it redirects to the closest Memento (to the given datetime) using the `Location` header.
- * If the term `proxy` is used instead of a format then it acts like a proxy for the closest original unmodified Memento with added CORS headers.
-* `Benchmark` is an optional endpoint that can be enabled by the `--monitor` flag when the server is started. If enabled, it provides a stream of the benchmark log over [SSE](http://www.html5rocks.com/en/tutorials/eventsource/basics/) for realtime visualization and monitoring.
+  * If a format is specified, it returns the description of the closest Memento (to the given datetime) in the specified format. It is essentially the same data that is available in the `Link` header of the `TimeGate` response, but as the payload in the format requested by the client.
+  * If a format is not specified, it redirects to the closest Memento (to the given datetime) using the `Location` header.
+  * If the term `proxy` is used instead of a format then it acts like a proxy for the closest original unmodified Memento with added CORS headers.
+* `About` endpoint reports the list of upstream archives, their status, and values of various configurations of the server.
+* `Monitor` is an optional endpoint that can be enabled by the `--monitor` flag when the server is started. If enabled, it provides a stream of the benchmark log over [SSE](http://www.html5rocks.com/en/tutorials/eventsource/basics/) for realtime visualization and monitoring.
 
 **NOTE:** A fallback endpoint `/api` is added for compatibility with [Time Travel APIs](http://timetravel.mementoweb.org/guide/api/#memento-json) to allow drop-in replacement in existing tools. This endpoint is an alias to the `/memento` endpoint that returns the description of a Memento.
 
 ## Download and Install
 
-Depending on the machine and operating system download appropriate binary from the [releases page](https://github.com/oduwsdl/memgator/releases). Change the mode of the file to executable `chmod +x MemGator-BINARY`. Run from the current location of the downloaded binary or rename it to `memgator` and move it into a directory that is in the `PATH` (such as `/usr/local/bin/`) to make it available as a command.
+Depending on the machine and operating system download appropriate binary from the [releases page](https://github.com/oduwsdl/MemGator/releases). Change the mode of the file to executable `chmod +x MemGator-BINARY`. Run from the current location of the downloaded binary or rename it to `memgator` and move it into a directory that is in the `PATH` (such as `/usr/local/bin/`) to make it available as a command.
 
 ## Running as a Docker Container
 
@@ -79,12 +81,15 @@ $ docker run ibnesayeed/memgator [options] server
 ## Full Usage
 
 ```
-MemGator {Version}
    _____                  _______       __
   /     \  _____  _____  / _____/______/  |___________
  /  Y Y  \/  __ \/     \/  \  ___\__  \   _/ _ \_   _ \
 /   | |   \  ___/  Y Y  \   \_\  \/ __ |  | |_| |  | \/
 \__/___\__/\____\__|_|__/\_______/_____|__|\___/|__|
+
+# MemGator ({Version})
+
+A Memento Aggregator CLI and Server in Go
 
 Usage:
   memgator [options] {URI-R}                            # TimeMap from CLI
@@ -93,9 +98,9 @@ Usage:
 
 Options:
   -A, --agent=MemGator:{Version} <{CONTACT}>  User-agent string sent to archives
-  -a, --arcs=http://git.io/archives           Local/remote JSON file path/URL for list of archives
-  -b, --benchmark=                            Benchmark file location - Defaults to Logfile
-  -c, --contact=@WebSciDL                     Email/URL/Twitter handle - used in the user-agent
+  -a, --arcs=https://git.io/archives          Local/remote JSON file path/URL for list of archives
+  -b, --benchmark=                            Benchmark file location - defaults to Logfile
+  -c, --contact=https://git.io/MemGator       Comment/Email/URL/Handle - used in the user-agent
   -D, --static=                               Directory path to serve static assets from
   -d, --dormant=15m0s                         Dormant period after consecutive failures
   -F, --tolerance=-1                          Failure tolerance limit for each archive

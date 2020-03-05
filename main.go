@@ -23,9 +23,11 @@ import (
 
 // Name consts need explanation, TODO
 const (
-	Name    = "MemGator"
-	Version = "1.0-rc7"
-	Art     = `
+	Name        = "MemGator"
+	Version     = "1.0-rc7"
+	Description = "A Memento Aggregator CLI and Server in Go"
+	Repository  = "https://git.io/MemGator"
+	Art         = `
    _____                  _______       __
   /     \  _____  _____  / _____/______/  |___________
  /  Y Y  \/  __ \/     \/  \  ___\__  \   _/ _ \_   _ \
@@ -53,11 +55,11 @@ var (
 )
 
 var format = flag.String([]string{"f", "-format"}, "Link", "Output format - Link/JSON/CDXJ")
-var arcsloc = flag.String([]string{"a", "-arcs"}, "http://git.io/archives", "Local/remote JSON file path/URL for list of archives")
+var arcsloc = flag.String([]string{"a", "-arcs"}, "https://git.io/archives", "Local/remote JSON file path/URL for list of archives")
 var logfile = flag.String([]string{"l", "-log"}, "", "Log file location - defaults to STDERR")
-var benchmark = flag.String([]string{"b", "-benchmark"}, "", "Benchmark file location - Defaults to Logfile")
-var contact = flag.String([]string{"c", "-contact"}, "@WebSciDL", "Email/URL/Twitter handle - used in the user-agent")
-var agent = flag.String([]string{"A", "-agent"}, fmt.Sprintf("%s:%s <{CONTACT}>", Name, Version), "User-agent string sent to archives")
+var benchmark = flag.String([]string{"b", "-benchmark"}, "", "Benchmark file location - defaults to Logfile")
+var contact = flag.String([]string{"c", "-contact"}, Repository, "Comment/Email/URL/Handle - used in the user-agent")
+var agent = flag.String([]string{"A", "-agent"}, fmt.Sprintf("%s/%s <{CONTACT}>", Name, Version), "User-agent string sent to archives")
 var host = flag.String([]string{"H", "-host"}, "localhost", "Host name - only used in web service mode")
 var proxy = flag.String([]string{"P", "-proxy"}, "http://{HOST}[:{PORT}]{ROOT}", "Proxy URL - defaults to host, port, and root")
 var root = flag.String([]string{"R", "-root"}, "/", "Service root path prefix")
@@ -393,7 +395,7 @@ func serializeLinks(urir string, basetm *list.List, format string, dataCh chan s
 		dataCh <- fmt.Sprintf(`    "cdxj_format": "%s/timemap/cdxj/%s"`+"\n  },\n", *proxy, urir)
 		dataCh <- fmt.Sprintf(`  "timegate_uri": "%s/timegate/%s"`+"\n}\n", *proxy, urir)
 	case "cdxj":
-		dataCh <- fmt.Sprintf(`!context ["http://tools.ietf.org/html/rfc7089"]` + "\n")
+		dataCh <- fmt.Sprintf(`!context ["https://oduwsdl.github.io/contexts/memento"]` + "\n")
 		if !navonly {
 			dataCh <- fmt.Sprintf(`!id {"uri": "%s/timemap/cdxj/%s"}`+"\n", *proxy, urir)
 		}
@@ -591,7 +593,7 @@ func memgatorService(w http.ResponseWriter, r *http.Request, urir string, format
 	logInfo.Printf("Aggregating Mementos for %s", urir)
 	basetm := aggregateTimemap(urir, dttmp, sess)
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Expose-Headers", "Link, Location, X-Memento-Count, X-Generator")
+	w.Header().Set("Access-Control-Expose-Headers", "Link, Location, X-Memento-Count, Server")
 	if dttmp == nil {
 		w.Header().Set("X-Memento-Count", fmt.Sprintf("%d", basetm.Len()))
 	}
@@ -643,7 +645,7 @@ func router(w http.ResponseWriter, r *http.Request) {
 	var format, urir, rawuri, rawdtm string
 	var dttm *time.Time
 	var err error
-	w.Header().Set("X-Generator", Name+":"+Version)
+	w.Header().Set("Server", Name+"/"+Version)
 	orequri := r.URL.RequestURI()
 	requri := strings.TrimPrefix(orequri, *root)
 	endpoint := strings.SplitN(requri, "/", 2)[0]
@@ -688,6 +690,10 @@ func router(w http.ResponseWriter, r *http.Request) {
 		} else {
 			err = fmt.Errorf("/memento[/{FORMAT}|proxy]/{DATETIME}/{URI-R} (FORMAT => %s, DATETIME => %s)", responseFormats, validDatetimes)
 		}
+	case "about":
+		logInfo.Printf("Service info printed")
+		fmt.Fprint(w, appInfo()+"\n"+serviceInfo())
+		return
 	case "monitor":
 		if *monitor {
 			logInfo.Printf("Benchmark monitoring client connected")
@@ -705,7 +711,7 @@ func router(w http.ResponseWriter, r *http.Request) {
 		}
 		if endpoint == "" && requri != orequri {
 			logInfo.Printf("Service info printed")
-			fmt.Fprint(w, serviceInfo())
+			fmt.Fprint(w, appInfo()+"\n"+serviceInfo())
 			return
 		}
 		logInfo.Printf("Delegated to default ServerMux: %s", orequri)
@@ -735,8 +741,8 @@ func router(w http.ResponseWriter, r *http.Request) {
 }
 
 func overrideFlags() {
-	if *agent == fmt.Sprintf("%s:%s <{CONTACT}>", Name, Version) {
-		*agent = fmt.Sprintf("%s:%s <%s>", Name, Version, *contact)
+	if *agent == fmt.Sprintf("%s/%s <{CONTACT}>", Name, Version) {
+		*agent = fmt.Sprintf("%s/%s <%s>", Name, Version, *contact)
 	}
 	if *root = "/" + strings.Trim(*root, "/") + "/"; *root == "//" {
 		*root = "/"
@@ -755,16 +761,80 @@ func overrideFlags() {
 }
 
 func serviceInfo() (msg string) {
-	msg = fmt.Sprintf("TimeMap   : %s/timemap/{FORMAT}/{URI-R}\nTimeGate  : %s/timegate/{URI-R} [Accept-Datetime]\nMemento   : %s/memento[/{FORMAT}|proxy]/{DATETIME}/{URI-R}\n", baseURL, baseURL, baseURL)
-	if *monitor {
-		msg += fmt.Sprintf("Benchmark : %s/monitor [SSE]\n", baseURL)
+	msg = "## API Endpoints\n\n"
+	msg += fmt.Sprintf("TimeMap:  %s/timemap/{FORMAT}/{URI-R}\n", *proxy)
+	msg += fmt.Sprintf("TimeGate: %s/timegate/{URI-R} [Accept-Datetime]\n", *proxy)
+	msg += fmt.Sprintf("Memento:  %s/memento[/{FORMAT}|proxy]/{DATETIME}/{URI-R}\n", *proxy)
+	msg += fmt.Sprintf("About:    %s/about\n", *proxy)
+	msg += "\n"
+	msg += fmt.Sprintf("  {FORMAT}          => %s\n", responseFormats)
+	msg += fmt.Sprintf("  {DATETIME}        => %s\n", validDatetimes)
+	msg += "  [Accept-Datetime] => Header in RFC1123 format\n"
+	msg += "\n\n"
+	msg += "## Upstream Archives\n"
+	for i, a := range archives {
+		name := a.Name
+		if name == "" {
+			name = a.ID
+		}
+		msg += fmt.Sprintf("\n%d. [%s](https://%s/)", i+1, name, a.ID)
+		if a.Dormant {
+			msg += " - (DORMANT)"
+		} else if a.Failures > 0 {
+			msg += fmt.Sprintf(" - (Consecutive failures: %d)", a.Failures)
+		}
 	}
-	msg += fmt.Sprintf("\n# FORMAT          => %s\n# DATETIME        => %s\n# Accept-Datetime => Header in RFC1123 format\n", responseFormats, validDatetimes)
+	msg += "\n\n\n"
+	msg += "## Configs\n\n"
+	msg += fmt.Sprintf("Archives list location: %s\n", *arcsloc)
+	ua := *agent
+	if *spoof {
+		ua = "A random browser UA - (SPOOFED)"
+	}
+	msg += fmt.Sprintf("User-agent:             %s\n", ua)
+	msg += "\n"
+	msg += fmt.Sprintf("Host:                   %s\n", *host)
+	msg += fmt.Sprintf("Port:                   %d\n", *port)
+	msg += fmt.Sprintf("Service path prefix:    %s\n", *root)
+	msg += fmt.Sprintf("Base URL (Proxy):       %s/\n", *proxy)
+	if *static != "" {
+		msg += fmt.Sprintf("Static assets:          %s\n", *static)
+	}
+	msg += "\n"
+	msg += fmt.Sprintf("Connection timeout:     %s\n", *contimeout)
+	msg += fmt.Sprintf("Header timeout:         %s\n", *hdrtimeout)
+	msg += fmt.Sprintf("Response timeout:       %s\n", *restimeout)
+	msg += "\n"
+	if *tolerance != -1 {
+		msg += fmt.Sprintf("Failure tolerance:      %d\n", *tolerance)
+		msg += fmt.Sprintf("Dormant period:         %s\n", *dormant)
+	}
+	if *topk != -1 {
+		msg += fmt.Sprintf("Select top archives:    %d\n", *topk)
+	}
+	if *tolerance != -1 || *topk != -1 {
+		msg += "\n"
+	}
+	logloc := "STDERR"
+	if *logfile != "" && !*verbose {
+		logloc = *logfile
+	}
+	msg += fmt.Sprintf("Logfile location:       %s\n", logloc)
+	if *benchmark != "" && !*verbose {
+		logloc = *benchmark
+	}
+	msg += fmt.Sprintf("Benchmark location:     %s\n", logloc)
+	if *verbose {
+		msg += "Verbose info output:    STDERR\n"
+	}
+	if *monitor {
+		msg += fmt.Sprintf("Monitor (Over SSE):     %s/monitor\n", *proxy)
+	}
 	return
 }
 
 func appInfo() (msg string) {
-	return fmt.Sprintf("%s %s%s\n", Name, Version, Art)
+	return fmt.Sprintf("%s\n# %s (%s)\n\n%s\n\n", Art, Name, Version, Description)
 }
 
 func usage() {
@@ -776,6 +846,7 @@ func usage() {
 	fmt.Fprintf(os.Stderr, "\nOptions:\n")
 	flag.PrintDefaults()
 	fmt.Fprintf(os.Stderr, "\n")
+	os.Exit(0)
 }
 
 func initLoggers() {
@@ -825,7 +896,7 @@ func initNetwork() {
 	}
 	reverseProxy = &httputil.ReverseProxy{
 		Transport:     &transport,
-		FlushInterval: time.Duration(100*time.Millisecond),
+		FlushInterval: time.Duration(100 * time.Millisecond),
 		Director: func(r *http.Request) {
 			r.URL.Path = regs["memdttm"].ReplaceAllString(r.URL.Path, "/${1}id_/")
 		},
@@ -838,13 +909,12 @@ func main() {
 	flag.Parse()
 	overrideFlags()
 	if *version {
-		fmt.Printf("%s %s\n", Name, Version)
-		os.Exit(1)
+		fmt.Printf("%s (%s)\n", Name, Version)
+		os.Exit(0)
 	}
 	target := flag.Arg(0)
 	if target == "" {
 		flag.Usage()
-		os.Exit(1)
 	}
 	initLoggers()
 	initNetwork()
@@ -862,10 +932,9 @@ func main() {
 		logFatal.Fatalf("Error parsing JSON (%s): %s\n", *arcsloc, err)
 	}
 	if target == "server" {
-		fmt.Printf(appInfo())
-		fmt.Printf(serviceInfo())
-		if *agent == fmt.Sprintf("%s:%s <@WebSciDL>", Name, Version) && !*spoof {
-			fmt.Printf("\nATTENTION: Please consider customizing the contact info or the whole user-agent!\nCurrent user-agent: %s\nCheck CLI help (memgator --help) for options.\n", *agent)
+		fmt.Printf(appInfo() + "\n" + serviceInfo())
+		if *agent == fmt.Sprintf("%s/%s <%s>", Name, Version, Repository) && !*spoof {
+			fmt.Print("\n\nATTENTION!\nConsider customizing the contact info or the whole user-agent.\nCheck CLI help (memgator --help) for options.\n\n")
 		}
 		if *monitor {
 			broker = sse.NewServer()
