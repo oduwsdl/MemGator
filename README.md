@@ -40,11 +40,11 @@ When run as a Web Service, MemGator exposes following customizable endpoints:
 
 ```
 $ memgator [options] server
-TimeMap:   http://localhost:1208/timemap/{FORMAT}/{URI-R}
-TimeGate:  http://localhost:1208/timegate/{URI-R} [Accept-Datetime]
-Memento:   http://localhost:1208/memento[/{FORMAT}|proxy]/{DATETIME}/{URI-R}
-Info:      http://localhost:1208/about
-Benchmark: http://localhost:1208/monitor - (Over SSE, if enabled)
+TimeMap:  http://localhost:1208/timemap/{FORMAT}/{URI-R}
+TimeGate: http://localhost:1208/timegate/{URI-R} [Accept-Datetime]
+Memento:  http://localhost:1208/memento[/{FORMAT}|proxy]/{DATETIME}/{URI-R}
+About:    http://localhost:1208/about
+Monitor:  http://localhost:1208/monitor - (Over SSE, if enabled)
 
   {FORMAT}          => link|json|cdxj
   {DATETIME}        => YYYY[MM[DD[hh[mm[ss]]]]]
@@ -57,8 +57,8 @@ Benchmark: http://localhost:1208/monitor - (Over SSE, if enabled)
   * If a format is specified, it returns the description of the closest Memento (to the given datetime) in the specified format. It is essentially the same data that is available in the `Link` header of the `TimeGate` response, but as the payload in the format requested by the client.
   * If a format is not specified, it redirects to the closest Memento (to the given datetime) using the `Location` header.
   * If the term `proxy` is used instead of a format then it acts like a proxy for the closest original unmodified Memento with added CORS headers.
-* `Info` endpoint reports the list of upstream archives, their status, and values of various configurations of the server.
-* `Benchmark` is an optional endpoint that can be enabled by the `--monitor` flag when the server is started. If enabled, it provides a stream of the benchmark log over [SSE](http://www.html5rocks.com/en/tutorials/eventsource/basics/) for realtime visualization and monitoring.
+* `About` endpoint reports the list of upstream archives, their status, and values of various configurations of the server.
+* `Monitor` is an optional endpoint that can be enabled by the `--monitor` flag when the server is started. If enabled, it provides a stream of the benchmark log over [SSE](http://www.html5rocks.com/en/tutorials/eventsource/basics/) for realtime visualization and monitoring.
 
 **NOTE:** A fallback endpoint `/api` is added for compatibility with [Time Travel APIs](http://timetravel.mementoweb.org/guide/api/#memento-json) to allow drop-in replacement in existing tools. This endpoint is an alias to the `/memento` endpoint that returns the description of a Memento.
 
