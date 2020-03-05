@@ -395,7 +395,7 @@ func serializeLinks(urir string, basetm *list.List, format string, dataCh chan s
 		dataCh <- fmt.Sprintf(`    "cdxj_format": "%s/timemap/cdxj/%s"`+"\n  },\n", *proxy, urir)
 		dataCh <- fmt.Sprintf(`  "timegate_uri": "%s/timegate/%s"`+"\n}\n", *proxy, urir)
 	case "cdxj":
-		dataCh <- fmt.Sprintf(`!context ["http://tools.ietf.org/html/rfc7089"]` + "\n")
+		dataCh <- fmt.Sprintf(`!context ["https://oduwsdl.github.io/contexts/memento"]` + "\n")
 		if !navonly {
 			dataCh <- fmt.Sprintf(`!id {"uri": "%s/timemap/cdxj/%s"}`+"\n", *proxy, urir)
 		}
