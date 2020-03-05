@@ -765,6 +765,7 @@ func serviceInfo() (msg string) {
 	msg += fmt.Sprintf("TimeMap:  %s/timemap/{FORMAT}/{URI-R}\n", *proxy)
 	msg += fmt.Sprintf("TimeGate: %s/timegate/{URI-R} [Accept-Datetime]\n", *proxy)
 	msg += fmt.Sprintf("Memento:  %s/memento[/{FORMAT}|proxy]/{DATETIME}/{URI-R}\n", *proxy)
+	msg += fmt.Sprintf("Info:     %s/about\n", *proxy)
 	msg += "\n"
 	msg += fmt.Sprintf("  {FORMAT}          => %s\n", responseFormats)
 	msg += fmt.Sprintf("  {DATETIME}        => %s\n", validDatetimes)
