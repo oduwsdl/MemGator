@@ -593,7 +593,7 @@ func memgatorService(w http.ResponseWriter, r *http.Request, urir string, format
 	logInfo.Printf("Aggregating Mementos for %s", urir)
 	basetm := aggregateTimemap(urir, dttmp, sess)
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Expose-Headers", "Link, Location, X-Memento-Count, X-Generator")
+	w.Header().Set("Access-Control-Expose-Headers", "Link, Location, X-Memento-Count, Server")
 	if dttmp == nil {
 		w.Header().Set("X-Memento-Count", fmt.Sprintf("%d", basetm.Len()))
 	}
@@ -645,7 +645,7 @@ func router(w http.ResponseWriter, r *http.Request) {
 	var format, urir, rawuri, rawdtm string
 	var dttm *time.Time
 	var err error
-	w.Header().Set("X-Generator", Name+":"+Version)
+	w.Header().Set("Server", Name+"/"+Version)
 	orequri := r.URL.RequestURI()
 	requri := strings.TrimPrefix(orequri, *root)
 	endpoint := strings.SplitN(requri, "/", 2)[0]
