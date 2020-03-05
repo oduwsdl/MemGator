@@ -757,9 +757,9 @@ func overrideFlags() {
 
 func serviceInfo() (msg string) {
 	msg = "## API Endpoints\n\n"
-	msg += fmt.Sprintf("TimeMap:  %s/timemap/{FORMAT}/{URI-R}\n", baseURL)
-	msg += fmt.Sprintf("TimeGate: %s/timegate/{URI-R} [Accept-Datetime]\n", baseURL)
-	msg += fmt.Sprintf("Memento:  %s/memento[/{FORMAT}|proxy]/{DATETIME}/{URI-R}\n", baseURL)
+	msg += fmt.Sprintf("TimeMap:  %s/timemap/{FORMAT}/{URI-R}\n", *proxy)
+	msg += fmt.Sprintf("TimeGate: %s/timegate/{URI-R} [Accept-Datetime]\n", *proxy)
+	msg += fmt.Sprintf("Memento:  %s/memento[/{FORMAT}|proxy]/{DATETIME}/{URI-R}\n", *proxy)
 	msg += "\n"
 	msg += fmt.Sprintf("  {FORMAT}          => %s\n", responseFormats)
 	msg += fmt.Sprintf("  {DATETIME}        => %s\n", validDatetimes)
@@ -822,7 +822,7 @@ func serviceInfo() (msg string) {
 		msg += "Verbose info output:    STDERR\n"
 	}
 	if *monitor {
-		msg += fmt.Sprintf("Benchmark (SSE):        %s/monitor\n", baseURL)
+		msg += fmt.Sprintf("Benchmark (SSE):        %s/monitor\n", *proxy)
 	}
 	return
 }
