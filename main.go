@@ -54,7 +54,7 @@ var (
 )
 
 var format = flag.String([]string{"f", "-format"}, "Link", "Output format - Link/JSON/CDXJ")
-var arcsloc = flag.String([]string{"a", "-arcs"}, "http://git.io/archives", "Local/remote JSON file path/URL for list of archives")
+var arcsloc = flag.String([]string{"a", "-arcs"}, "https://git.io/archives", "Local/remote JSON file path/URL for list of archives")
 var logfile = flag.String([]string{"l", "-log"}, "", "Log file location - defaults to STDERR")
 var benchmark = flag.String([]string{"b", "-benchmark"}, "", "Benchmark file location - defaults to Logfile")
 var contact = flag.String([]string{"c", "-contact"}, Repo, "Comment/Email/URL/Handle - used in the user-agent")
