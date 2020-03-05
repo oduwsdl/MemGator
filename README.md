@@ -122,23 +122,25 @@ Options:
 
 ## Build
 
-Assuming that Git and Go (version >= 1.7) are installed, the `GOPATH` environment variable is set to the Go Workspace directory as described in the [How to Write Go Code](https://golang.org/doc/code.html), and `PATH` includes `$GOPATH/bin`. Cloning, building, and running the code can be done using following commands:
+Assuming that Git and Go (version >= 1.14) are installed. Cloning, running, building, and installing the code can be done using following commands:
 
 ```
-$ cd $GOPATH
-$ go get github.com/oduwsdl/memgator
-$ go install github.com/oduwsdl/memgator
+$ git clone https://github.com/oduwsdl/MemGator.git
+$ cd MemGator
+$ go run main.go
+$ go build
+$ go install
+$ memgator --help
 $ memgator http://example.com/
 ```
 
-To compile cross-platform binaries, go to the MemGator source directory and run the `crossbuild.sh` script:
+To compile cross-platform binaries run the `crossbuild.sh` script:
 
 ```
-$ cd $GOPATH/src/github.com/oduwsdl/memgator
 $ ./crossbuild.sh
 ```
 
-This will generate various binaries in `/tmp/mgbins` directory.
+This will generate binaries for various OSes and Architectures in `/tmp/mgbins` directory.
 
 ## Citing Project
 
