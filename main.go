@@ -25,6 +25,7 @@ import (
 const (
 	Name    = "MemGator"
 	Version = "1.0-rc7"
+	Repo    = "https://git.io/MemGator"
 	Art     = `
    _____                  _______       __
   /     \  _____  _____  / _____/______/  |___________
@@ -55,9 +56,9 @@ var (
 var format = flag.String([]string{"f", "-format"}, "Link", "Output format - Link/JSON/CDXJ")
 var arcsloc = flag.String([]string{"a", "-arcs"}, "http://git.io/archives", "Local/remote JSON file path/URL for list of archives")
 var logfile = flag.String([]string{"l", "-log"}, "", "Log file location - defaults to STDERR")
-var benchmark = flag.String([]string{"b", "-benchmark"}, "", "Benchmark file location - Defaults to Logfile")
-var contact = flag.String([]string{"c", "-contact"}, "@WebSciDL", "Email/URL/Twitter handle - used in the user-agent")
-var agent = flag.String([]string{"A", "-agent"}, fmt.Sprintf("%s:%s <{CONTACT}>", Name, Version), "User-agent string sent to archives")
+var benchmark = flag.String([]string{"b", "-benchmark"}, "", "Benchmark file location - defaults to Logfile")
+var contact = flag.String([]string{"c", "-contact"}, Repo, "Comment/Email/URL/Handle - used in the user-agent")
+var agent = flag.String([]string{"A", "-agent"}, fmt.Sprintf("%s/%s <{CONTACT}>", Name, Version), "User-agent string sent to archives")
 var host = flag.String([]string{"H", "-host"}, "localhost", "Host name - only used in web service mode")
 var proxy = flag.String([]string{"P", "-proxy"}, "http://{HOST}[:{PORT}]{ROOT}", "Proxy URL - defaults to host, port, and root")
 var root = flag.String([]string{"R", "-root"}, "/", "Service root path prefix")
@@ -735,8 +736,8 @@ func router(w http.ResponseWriter, r *http.Request) {
 }
 
 func overrideFlags() {
-	if *agent == fmt.Sprintf("%s:%s <{CONTACT}>", Name, Version) {
-		*agent = fmt.Sprintf("%s:%s <%s>", Name, Version, *contact)
+	if *agent == fmt.Sprintf("%s/%s <{CONTACT}>", Name, Version) {
+		*agent = fmt.Sprintf("%s/%s <%s>", Name, Version, *contact)
 	}
 	if *root = "/" + strings.Trim(*root, "/") + "/"; *root == "//" {
 		*root = "/"
@@ -926,7 +927,7 @@ func main() {
 	}
 	if target == "server" {
 		fmt.Printf(appInfo() + "\n" + serviceInfo())
-		if *agent == fmt.Sprintf("%s:%s <@WebSciDL>", Name, Version) && !*spoof {
+		if *agent == fmt.Sprintf("%s/%s <%s>", Name, Version, Repo) && !*spoof {
 			fmt.Print("\n\nATTENTION!\nConsider customizing the contact info or the whole user-agent.\nCheck CLI help (memgator --help) for options.\n\n")
 		}
 		if *monitor {
