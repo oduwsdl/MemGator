@@ -1,11 +1,14 @@
-FROM       golang AS builder
+ARG        GOLANG_TAG=latest
+ARG        ALPINE_TAG=latest
+
+FROM       golang:${GOLANG_TAG} AS builder
 
 WORKDIR    /go/src/github.com/oduwsdl/memgator
 COPY       . .
 RUN        GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go install -ldflags="-w -s"
 
 
-FROM       alpine
+FROM       alpine:${ALPINE_TAG}
 
 LABEL      org.opencontainers.image.title="MemGator" \
            org.opencontainers.image.description="A Memento Aggregator CLI and Server in Go" \
