@@ -1,0 +1,7 @@
+.git
+.gitignore
+Dockerfile
+README.md
+LICENSE
+crossbuild.sh
+docs
