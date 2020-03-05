@@ -690,6 +690,10 @@ func router(w http.ResponseWriter, r *http.Request) {
 		} else {
 			err = fmt.Errorf("/memento[/{FORMAT}|proxy]/{DATETIME}/{URI-R} (FORMAT => %s, DATETIME => %s)", responseFormats, validDatetimes)
 		}
+	case "about":
+		logInfo.Printf("Service info printed")
+		fmt.Fprint(w, appInfo()+"\n"+serviceInfo())
+		return
 	case "monitor":
 		if *monitor {
 			logInfo.Printf("Benchmark monitoring client connected")
@@ -776,7 +780,7 @@ func serviceInfo() (msg string) {
 		if a.Dormant {
 			msg += " - (DORMANT)"
 		} else if a.Failures > 0 {
-			msg += fmt.Sprintf(" - (Consecutive failures: %s)", a.Failures)
+			msg += fmt.Sprintf(" - (Consecutive failures: %d)", a.Failures)
 		}
 	}
 	msg += "\n\n\n"
