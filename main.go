@@ -707,7 +707,7 @@ func router(w http.ResponseWriter, r *http.Request) {
 		}
 		if endpoint == "" && requri != orequri {
 			logInfo.Printf("Service info printed")
-			fmt.Fprint(w, serviceInfo())
+			fmt.Fprint(w, appInfo()+"\n"+serviceInfo())
 			return
 		}
 		logInfo.Printf("Delegated to default ServerMux: %s", orequri)
