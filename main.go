@@ -846,6 +846,7 @@ func usage() {
 	fmt.Fprintf(os.Stderr, "\nOptions:\n")
 	flag.PrintDefaults()
 	fmt.Fprintf(os.Stderr, "\n")
+	os.Exit(0)
 }
 
 func initLoggers() {
@@ -908,13 +909,12 @@ func main() {
 	flag.Parse()
 	overrideFlags()
 	if *version {
-		fmt.Printf("%s %s\n", Name, Version)
-		os.Exit(1)
+		fmt.Printf("%s (%s)\n", Name, Version)
+		os.Exit(0)
 	}
 	target := flag.Arg(0)
 	if target == "" {
 		flag.Usage()
-		os.Exit(1)
 	}
 	initLoggers()
 	initNetwork()
