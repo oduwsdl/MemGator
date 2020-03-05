@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 echo "Building binaries for various platforms"
 
 # Create directory to store all binaries
@@ -26,5 +28,3 @@ done
 
 echo "Following binaries have been created in: $binsdir"
 ls -lh $binsdir
-
-exit 0
