@@ -64,7 +64,7 @@ Monitor:  http://localhost:1208/monitor - (Over SSE, if enabled)
 
 ## Download and Install
 
-Depending on the machine and operating system download appropriate binary from the [releases page](https://github.com/oduwsdl/memgator/releases). Change the mode of the file to executable `chmod +x MemGator-BINARY`. Run from the current location of the downloaded binary or rename it to `memgator` and move it into a directory that is in the `PATH` (such as `/usr/local/bin/`) to make it available as a command.
+Depending on the machine and operating system download appropriate binary from the [releases page](https://github.com/oduwsdl/MemGator/releases). Change the mode of the file to executable `chmod +x MemGator-BINARY`. Run from the current location of the downloaded binary or rename it to `memgator` and move it into a directory that is in the `PATH` (such as `/usr/local/bin/`) to make it available as a command.
 
 ## Running as a Docker Container
 
