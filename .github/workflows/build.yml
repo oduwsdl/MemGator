@@ -10,5 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - uses: actions/setup-go@master
+        with:
+          go-version: '1.14'
       - name: Run Cross-build
         run: ./crossbuild.sh
