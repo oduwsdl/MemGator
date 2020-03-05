@@ -1,0 +1,14 @@
+name: Build Binaries
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-go@master
+      - name: Run Cross-build
+        run: ./crossbuild.sh
