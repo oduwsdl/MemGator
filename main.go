@@ -23,10 +23,11 @@ import (
 
 // Name consts need explanation, TODO
 const (
-	Name    = "MemGator"
-	Version = "1.0-rc7"
-	Repo    = "https://git.io/MemGator"
-	Art     = `
+	Name        = "MemGator"
+	Version     = "1.0-rc7"
+	Description = "A Memento Aggregator CLI and Server in Go"
+	Repository  = "https://git.io/MemGator"
+	Art         = `
    _____                  _______       __
   /     \  _____  _____  / _____/______/  |___________
  /  Y Y  \/  __ \/     \/  \  ___\__  \   _/ _ \_   _ \
@@ -57,7 +58,7 @@ var format = flag.String([]string{"f", "-format"}, "Link", "Output format - Link
 var arcsloc = flag.String([]string{"a", "-arcs"}, "https://git.io/archives", "Local/remote JSON file path/URL for list of archives")
 var logfile = flag.String([]string{"l", "-log"}, "", "Log file location - defaults to STDERR")
 var benchmark = flag.String([]string{"b", "-benchmark"}, "", "Benchmark file location - defaults to Logfile")
-var contact = flag.String([]string{"c", "-contact"}, Repo, "Comment/Email/URL/Handle - used in the user-agent")
+var contact = flag.String([]string{"c", "-contact"}, Repository, "Comment/Email/URL/Handle - used in the user-agent")
 var agent = flag.String([]string{"A", "-agent"}, fmt.Sprintf("%s/%s <{CONTACT}>", Name, Version), "User-agent string sent to archives")
 var host = flag.String([]string{"H", "-host"}, "localhost", "Host name - only used in web service mode")
 var proxy = flag.String([]string{"P", "-proxy"}, "http://{HOST}[:{PORT}]{ROOT}", "Proxy URL - defaults to host, port, and root")
@@ -828,7 +829,7 @@ func serviceInfo() (msg string) {
 }
 
 func appInfo() (msg string) {
-	return fmt.Sprintf("%s %s%s\n", Name, Version, Art)
+	return fmt.Sprintf("%s\n# %s (%s)\n\n%s\n\n", Art, Name, Version, Description)
 }
 
 func usage() {
@@ -927,7 +928,7 @@ func main() {
 	}
 	if target == "server" {
 		fmt.Printf(appInfo() + "\n" + serviceInfo())
-		if *agent == fmt.Sprintf("%s/%s <%s>", Name, Version, Repo) && !*spoof {
+		if *agent == fmt.Sprintf("%s/%s <%s>", Name, Version, Repository) && !*spoof {
 			fmt.Print("\n\nATTENTION!\nConsider customizing the contact info or the whole user-agent.\nCheck CLI help (memgator --help) for options.\n\n")
 		}
 		if *monitor {
