@@ -1,0 +1,38 @@
+name: Publish Docker Images
+
+on:
+  push:
+    branches:
+      - master
+  release:
+    types:
+      - published
+
+jobs:
+  publish-master:
+    runs-on: ubuntu-18.04
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@master
+      - name: Build and Publish master
+        uses: VaultVulp/gp-docker-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          image-name: memgator
+          image-tag: master
+  publish-release:
+    runs-on: ubuntu-18.04
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - uses: actions/checkout@master
+      - name: Build and Publish latest
+        uses: VaultVulp/gp-docker-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          image-name: memgator
+      - name: Build and Publish versioned
+        uses: VaultVulp/gp-docker-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          image-name: memgator
+          extract-git-tag: true
