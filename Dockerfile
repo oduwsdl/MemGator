@@ -3,7 +3,7 @@ ARG        ALPINE_TAG=latest
 
 FROM       golang:${GOLANG_TAG} AS builder
 
-WORKDIR    /go/src/github.com/oduwsdl/memgator
+WORKDIR    /app
 COPY       . .
 RUN        GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go install -ldflags="-w -s"
 
