@@ -11,11 +11,12 @@ A Memento Aggregator CLI and Server in [Go](https://golang.org/).
 * Good API parity with the [main Memento Aggregator service](http://timetravel.mementoweb.org/guide/api/)
 * Concurrent - Splits every session in subtasks for parallel execution
 * Parallel - Utilizes all the available CPUs
-* Custom archive list (a local JSON file or a remote URL) - a sample JSON is included in the repository
+* Custom archive list (a local JSON file or a remote URL) - A sample JSON is included in the repository
 * Probability based archive prioritization and limit
+* Configurable automated temporary exclusion of malfunctioning upstream archives
 * Three levels of customizable timeouts for greater control over remote requests
 * Customizable logging and profiling in CDXJ format
-* Customizable endpoint URLs - helpful in load-balancing
+* Customizable endpoint URLs - Helpful in load-balancing
 * Customizable User-Agent to be sent to each archive and User-Agent spoofing
 * Configurable archive failure detection and automatic hibernation
 * [CORS](http://www.w3.org/TR/cors/) support to make it easy to use it from JavaScript clients
