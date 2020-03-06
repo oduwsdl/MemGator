@@ -69,10 +69,24 @@ Depending on the machine and operating system download appropriate binary from t
 
 ## Running as a Docker Container
 
-The first command below is not necessary, but it allows pulling the latest version of the MemGator Docker image.
+Build a Docker image locally from the source.
 
 ```
+$ git clone https://github.com/oduwsdl/MemGator.git
+$ cd MemGator
+$ docker image build -t oduwsdl/memgator .
+```
+
+Alternatively, pull a published image from one of the two Docker image registries below:
+
+```
+$ docker image pull docker.pkg.github.com/oduwsdl/memgator/memgator
 $ docker image pull oduwsdl/memgator
+```
+
+Run MemGator with various options inside a Docker container.
+
+```
 $ docker container run -it --rm oduwsdl/memgator -h
 $ docker container run -it --rm oduwsdl/memgator [options] {URI-R}
 $ docker container run -it --rm oduwsdl/memgator [options] {URI-R} {YYYY[MM[DD[hh[mm[ss]]]]]}
