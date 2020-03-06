@@ -97,7 +97,7 @@ Usage:
   memgator [options] server                             # Run as a Web Service
 
 Options:
-  -A, --agent=MemGator:{Version} <{CONTACT}>  User-agent string sent to archives
+  -A, --agent=MemGator/{Version} <{CONTACT}>  User-agent string sent to archives
   -a, --arcs=https://git.io/archives          Local/remote JSON file path/URL for list of archives
   -b, --benchmark=                            Benchmark file location - defaults to Logfile
   -c, --contact=https://git.io/MemGator       Comment/Email/URL/Handle - used in the user-agent
