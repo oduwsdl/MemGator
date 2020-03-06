@@ -71,11 +71,13 @@ Depending on the machine and operating system download appropriate binary from t
 The first command below is not necessary, but it allows pulling the latest version of the MemGator Docker image.
 
 ```
-$ docker pull ibnesayeed/memgator
-$ docker run ibnesayeed/memgator -h
-$ docker run ibnesayeed/memgator [options] {URI-R}
-$ docker run ibnesayeed/memgator [options] {URI-R} {YYYY[MM[DD[hh[mm[ss]]]]]}
-$ docker run ibnesayeed/memgator [options] server
+$ docker image pull oduwsdl/memgator
+$ docker container run -it --rm oduwsdl/memgator -h
+$ docker container run -it --rm oduwsdl/memgator [options] {URI-R}
+$ docker container run -it --rm oduwsdl/memgator [options] {URI-R} {YYYY[MM[DD[hh[mm[ss]]]]]}
+$ docker container run -d --name=memgator-server -p 1208:1208 oduwsdl/memgator [options] server
+$ curl -i http://localhost:1208/about
+$ docker container rm -f memgator-server
 ```
 
 ## Full Usage
