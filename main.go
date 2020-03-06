@@ -24,7 +24,7 @@ import (
 // Name consts need explanation, TODO
 const (
 	Name        = "MemGator"
-	Version     = "1.0-rc7"
+	Version     = "1.0-rc8"
 	Description = "A Memento Aggregator CLI and Server in Go"
 	Repository  = "https://git.io/MemGator"
 	Art         = `
