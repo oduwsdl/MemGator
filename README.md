@@ -20,7 +20,7 @@ A Memento Aggregator CLI and Server in [Go](https://golang.org/).
 * Configurable archive failure detection and automatic hibernation
 * [CORS](http://www.w3.org/TR/cors/) support to make it easy to use it from JavaScript clients
 * Memento count exposed in the header that can be retrieved via `HEAD` request
-* [Docker](https://www.docker.com/) friendly - An image available as [ibnesayeed/memgator](https://hub.docker.com/r/ibnesayeed/memgator/)
+* [Docker](https://www.docker.com/) friendly - An image available as [oduwsdl/memgator](https://hub.docker.com/r/oduwsdl/memgator)
 * Sensible defaults - Batteries included, but replaceable
 
 ## Usage

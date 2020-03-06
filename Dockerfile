@@ -14,7 +14,7 @@ LABEL      org.opencontainers.image.title="MemGator" \
            org.opencontainers.image.description="A Memento Aggregator CLI and Server in Go" \
            org.opencontainers.image.authors="Sawood Alam <@ibnesayeed>" \
            org.opencontainers.image.source="https://github.com/oduwsdl/MemGator" \
-           org.opencontainers.image.url="https://github.com/oduwsdl/MemGator" \
+           org.opencontainers.image.url="https://hub.docker.com/r/oduwsdl/memgator" \
            org.opencontainers.image.licenses="MIT"
 
 RUN        apk add ca-certificates
