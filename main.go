@@ -4,11 +4,10 @@ import (
 	"container/list"
 	"encoding/json"
 	"fmt"
-	flag "github.com/oduwsdl/memgator/pkg/mflag"
-	"github.com/oduwsdl/memgator/pkg/sse"
 	"io/ioutil"
 	"log"
 	"math/rand"
+	flag "mflag"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -16,6 +15,7 @@ import (
 	"os"
 	"regexp"
 	"sort"
+	"sse"
 	"strings"
 	"sync"
 	"time"
@@ -24,7 +24,7 @@ import (
 // Name consts need explanation, TODO
 const (
 	Name        = "MemGator"
-	Version     = "1.0-rc7"
+	Version     = "1.0-rc8"
 	Description = "A Memento Aggregator CLI and Server in Go"
 	Repository  = "https://git.io/MemGator"
 	Art         = `

@@ -20,7 +20,7 @@ A Memento Aggregator CLI and Server in [Go](https://golang.org/).
 * Configurable archive failure detection and automatic hibernation
 * [CORS](http://www.w3.org/TR/cors/) support to make it easy to use it from JavaScript clients
 * Memento count exposed in the header that can be retrieved via `HEAD` request
-* [Docker](https://www.docker.com/) friendly - An image available as [ibnesayeed/memgator](https://hub.docker.com/r/ibnesayeed/memgator/)
+* [Docker](https://www.docker.com/) friendly - An image available as [oduwsdl/memgator](https://hub.docker.com/r/oduwsdl/memgator)
 * Sensible defaults - Batteries included, but replaceable
 
 ## Usage
@@ -71,11 +71,13 @@ Depending on the machine and operating system download appropriate binary from t
 The first command below is not necessary, but it allows pulling the latest version of the MemGator Docker image.
 
 ```
-$ docker pull ibnesayeed/memgator
-$ docker run ibnesayeed/memgator -h
-$ docker run ibnesayeed/memgator [options] {URI-R}
-$ docker run ibnesayeed/memgator [options] {URI-R} {YYYY[MM[DD[hh[mm[ss]]]]]}
-$ docker run ibnesayeed/memgator [options] server
+$ docker image pull oduwsdl/memgator
+$ docker container run -it --rm oduwsdl/memgator -h
+$ docker container run -it --rm oduwsdl/memgator [options] {URI-R}
+$ docker container run -it --rm oduwsdl/memgator [options] {URI-R} {YYYY[MM[DD[hh[mm[ss]]]]]}
+$ docker container run -d --name=memgator-server -p 1208:1208 oduwsdl/memgator [options] server
+$ curl -i http://localhost:1208/about
+$ docker container rm -f memgator-server
 ```
 
 ## Full Usage
@@ -97,7 +99,7 @@ Usage:
   memgator [options] server                             # Run as a Web Service
 
 Options:
-  -A, --agent=MemGator:{Version} <{CONTACT}>  User-agent string sent to archives
+  -A, --agent=MemGator/{Version} <{CONTACT}>  User-agent string sent to archives
   -a, --arcs=https://git.io/archives          Local/remote JSON file path/URL for list of archives
   -b, --benchmark=                            Benchmark file location - defaults to Logfile
   -c, --contact=https://git.io/MemGator       Comment/Email/URL/Handle - used in the user-agent
@@ -122,23 +124,25 @@ Options:
 
 ## Build
 
-Assuming that Git and Go (version >= 1.7) are installed, the `GOPATH` environment variable is set to the Go Workspace directory as described in the [How to Write Go Code](https://golang.org/doc/code.html), and `PATH` includes `$GOPATH/bin`. Cloning, building, and running the code can be done using following commands:
+Assuming that Git and Go (version >= 1.14) are installed. Cloning, running, building, and installing the code can be done using following commands:
 
 ```
-$ cd $GOPATH
-$ go get github.com/oduwsdl/memgator
-$ go install github.com/oduwsdl/memgator
+$ git clone https://github.com/oduwsdl/MemGator.git
+$ cd MemGator
+$ go run main.go
+$ go build
+$ go install
+$ memgator --help
 $ memgator http://example.com/
 ```
 
-To compile cross-platform binaries, go to the MemGator source directory and run the `crossbuild.sh` script:
+To compile cross-platform binaries run the `crossbuild.sh` script:
 
 ```
-$ cd $GOPATH/src/github.com/oduwsdl/memgator
 $ ./crossbuild.sh
 ```
 
-This will generate various binaries in `/tmp/mgbins` directory.
+This will generate binaries for various OSes and Architectures in `/tmp/mgbins` directory.
 
 ## Citing Project
 

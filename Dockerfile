@@ -3,7 +3,7 @@ ARG        ALPINE_TAG=latest
 
 FROM       golang:${GOLANG_TAG} AS builder
 
-WORKDIR    /go/src/github.com/oduwsdl/memgator
+WORKDIR    /app
 COPY       . .
 RUN        GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go install -ldflags="-w -s"
 
@@ -14,7 +14,7 @@ LABEL      org.opencontainers.image.title="MemGator" \
            org.opencontainers.image.description="A Memento Aggregator CLI and Server in Go" \
            org.opencontainers.image.authors="Sawood Alam <@ibnesayeed>" \
            org.opencontainers.image.source="https://github.com/oduwsdl/MemGator" \
-           org.opencontainers.image.url="https://github.com/oduwsdl/MemGator" \
+           org.opencontainers.image.url="https://hub.docker.com/r/oduwsdl/memgator" \
            org.opencontainers.image.licenses="MIT"
 
 RUN        apk add ca-certificates
