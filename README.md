@@ -165,7 +165,7 @@ A publication related to this project appeared in the proceedings of JCDL 2016 (
 
 > Sawood Alam, Michael Nelson. __MemGator - A Portable Concurrent Memento Aggregator: Cross-Platform CLI and Server Binaries in Go__. In _Proceedings of the 16th ACM/IEEE-CS on Joint Conference on Digital Libraries, JCDL 2016_, pp. 243-244, Newark, New Jersey, USA, June 2016.
 
-```latex
+```bib
 @inproceedings{jcdl-2016:alam:memgator,
   author    = {Sawood Alam and
                Michael L. Nelson},
