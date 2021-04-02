@@ -21,7 +21,9 @@ for os in $oses; do
     if [ $os == "windows" ]; then
       GOOS=$os GOARCH=$arc go build -v -o $fn.exe
     else
-      GOOS=$os GOARCH=$arc CGO_ENABLED=0 go build -v -a -installsuffix cgo -o $fn
+      GOOS=$os GOARCH=$arc CGO_ENABLED=0 go build -v -a -installsuffix cgo -o $fn || {
+        echo "Failed to build $os/$arc"
+      }
     fi
   done
 done
