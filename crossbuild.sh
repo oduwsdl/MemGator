@@ -7,6 +7,7 @@ echo "Building binaries for various platforms"
 # Create directory to store all binaries
 binsdir=/tmp/mgbins
 mkdir -p $binsdir
+rm -rf $binsdir/memgator-*
 echo "Output directory for binaries created: $binsdir"
 
 # Platforms (OS/arch matrix)
