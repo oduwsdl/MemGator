@@ -27,4 +27,4 @@ for p in $platforms; do
 done
 
 echo "Following binaries have been created in: $binsdir"
-ls -lh $binsdir
+(cd /tmp/mgbins/ && ls -lh memgator-*)
