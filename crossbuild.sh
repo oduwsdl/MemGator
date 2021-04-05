@@ -11,7 +11,7 @@ rm -rf $binsdir/memgator-*
 echo "Output directory for binaries created: $binsdir"
 
 # Platforms (OS/arch matrix)
-platforms="linux/amd64 darwin/amd64 windows/amd64"
+platforms="linux/amd64 darwin/amd64 windows/amd64 darwin/arm64"
 
 # Build binaries for all listed platforms
 for p in $platforms; do
