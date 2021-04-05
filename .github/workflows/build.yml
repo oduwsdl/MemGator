@@ -6,18 +6,18 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-go@master
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v2
         with:
-          go-version: '1.14'
+          go-version: '1.16'
       - name: Run Cross-build
         run: ./crossbuild.sh
       - name: Show MemGator CLI Help
         run: /tmp/mgbins/memgator-linux-amd64
       - name: Upload Built MemGator Binaries
-        uses: actions/upload-artifact@master
+        uses: actions/upload-artifact@v2
         with:
           name: memgator-bins
           path: /tmp/mgbins
