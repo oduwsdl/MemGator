@@ -37,6 +37,12 @@
     "timegate": "https://waext.banq.qc.ca/wayback/"
   },
   {
+    "id": "warp.da.ndl.go.jp",
+    "name": "National Diet Library, Japan",
+    "timemap": "https://warp.da.ndl.go.jp/collections/timemap/",
+    "timegate": "https://warp.da.ndl.go.jp/collections/"
+  },
+  {
     "id": "wayback.archive-it.org",
     "name": "Archive-It",
     "timemap": "https://wayback.archive-it.org/all/timemap/link/",
