@@ -51,14 +51,15 @@
   {
     "id": "wayback.vefsafn.is",
     "name": "Icelandic Web Archive",
-    "timemap": "http://wayback.vefsafn.is/wayback/timemap/link/",
-    "timegate": "http://wayback.vefsafn.is/wayback/"
+    "timemap": "http://vefsafn.is/timemap/link/",
+    "timegate": "http://vefsafn.is/"
   },
   {
     "id": "web.archive.bibalex.org",
     "name": "Bibliotheca Alexandrina Web Archive",
     "timemap": "http://web.archive.bibalex.org/web/timemap/link/",
-    "timegate": "http://web.archive.bibalex.org/web/"
+    "timegate": "http://web.archive.bibalex.org/web/",
+    "ignore": true
   },
   {
     "id": "web.archive.org",
