@@ -320,7 +320,7 @@ func fetchTimemap(urir string, arch *Archive, tmCh chan *list.List, wg *sync.Wai
 		}
 		lnks = string(body)
 	}
-	benchmarker(arch.ID, "timemapfetch", fmt.Sprintf("TimeMap fethched from %s", arch.Name), start, sess)
+	benchmarker(arch.ID, "timemapfetch", fmt.Sprintf("TimeMap fetched from %s", arch.Name), start, sess)
 	start = time.Now()
 	lnkrcvd := make(chan string, 1)
 	lnksplt := make(chan string, 128)
