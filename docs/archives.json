@@ -115,5 +115,11 @@
     "timemap": "http://webarchive.proni.gov.uk/timemap/",
     "timegate": "http://webarchive.proni.gov.uk/timegate/",
     "ignore": true
+  },
+  {
+    "id": "wayback.nli.org.il",
+    "name": "National Library of Israel",
+    "timemap": "https://wayback.nli.org.il/timemap/link/",
+    "timegate": "https://wayback.nli.org.il/"
   }
 ]
