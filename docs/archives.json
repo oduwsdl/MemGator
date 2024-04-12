@@ -2,8 +2,8 @@
   {
     "id": "archive.today",
     "name": "Archive.today",
-    "timemap": "https://archive.today/timemap/",
-    "timegate": "https://archive.today/timegate/"
+    "timemap": "http://archive.today/timemap/",
+    "timegate": "http://archive.today/timegate/"
   },
   {
     "id": "arquivo.pt",
