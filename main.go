@@ -472,13 +472,17 @@ func aggregateTimemap(urir string, dttmp *time.Time, sess *Session) (basetm *lis
 }
 
 func parseURI(uri string) (urir string, err error) {
-	if !regs["isprtcl"].MatchString(uri) {
-		uri = "http://" + uri
+	uescd, err := url.QueryUnescape(uri)
+	if !regs["isprtcl"].MatchString(uescd) {
+		uescd = "http://" + uri
 	}
-	u, err := url.Parse(uri)
+
+	u, err := url.Parse(uescd)
+
 	if err == nil {
 		urir = u.String()
 	}
+
 	return
 }
 
