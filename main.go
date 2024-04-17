@@ -473,22 +473,17 @@ func aggregateTimemap(urir string, dttmp *time.Time, sess *Session) (basetm *lis
 
 func parseURI(uri string) (urir string, err error) {
 	uescd, err := url.PathUnescape(uri)
-
 	if err != nil {
 		logError.Printf("Error Unescaping path (%s): %v", uri, err)
 		return
 	}
-
 	if !regs["isprtcl"].MatchString(uescd) {
 		uescd = "http://" + uescd
 	}
-
 	u, err := url.Parse(uescd)
-
 	if err == nil {
 		urir = u.String()
 	}
-
 	return
 }
 
