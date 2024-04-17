@@ -477,6 +477,7 @@ func parseURI(uri string) (urir string, err error) {
 		logError.Printf("Error Unescaping path (%s): %v", uri, err)
 		return
 	}
+	uescd = strings.ReplaceAll(uescd, " ", "%20")
 	if !regs["isprtcl"].MatchString(uescd) {
 		uescd = "http://" + uescd
 	}
