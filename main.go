@@ -472,10 +472,16 @@ func aggregateTimemap(urir string, dttmp *time.Time, sess *Session) (basetm *lis
 }
 
 func parseURI(uri string) (urir string, err error) {
-	if !regs["isprtcl"].MatchString(uri) {
-		uri = "http://" + uri
+	uescd, err := url.PathUnescape(uri)
+	if err != nil {
+		logError.Printf("Error Unescaping path (%s): %v", uri, err)
+		return
 	}
-	u, err := url.Parse(uri)
+	uescd = strings.ReplaceAll(uescd, " ", "%20")
+	if !regs["isprtcl"].MatchString(uescd) {
+		uescd = "http://" + uescd
+	}
+	u, err := url.Parse(uescd)
 	if err == nil {
 		urir = u.String()
 	}
