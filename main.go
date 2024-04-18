@@ -16,6 +16,7 @@ import (
 	"regexp"
 	"sort"
 	"sse"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -156,6 +157,7 @@ var regs = map[string]*regexp.Regexp{
 	"memdttm": regexp.MustCompile(`/(\d{14})/`),
 	"dttmstr": regexp.MustCompile(`^(\d{4})(\d{2})?(\d{2})?(\d{2})?(\d{2})?(\d{2})?$`),
 	"tmappth": regexp.MustCompile(`^timemap/(link|json|cdxj)/.+`),
+	"tmsmpth": regexp.MustCompile(`^timemapsummary/.+`),
 	"tgatpth": regexp.MustCompile(`^timegate/.+`),
 	"descpth": regexp.MustCompile(`^(memento|api)/(link|json|cdxj|proxy)/(\d{4})(\d{2})?(\d{2})?(\d{2})?(\d{2})?(\d{2})?/.+`),
 	"rdrcpth": regexp.MustCompile(`^memento/(\d{4})(\d{2})?(\d{2})?(\d{2})?(\d{2})?(\d{2})?/.+`),
@@ -330,6 +332,79 @@ func fetchTimemap(urir string, arch *Archive, tmCh chan *list.List, wg *sync.Wai
 	tmCh <- tml
 	benchmarker(arch.ID, "extractmementos", fmt.Sprintf("%d Mementos extracted from %s", tml.Len(), arch.Name), start, sess)
 	logInfo.Printf("%s => Success: %d mementos", arch.ID, tml.Len())
+}
+
+func generateSummary(urir string, basetm *list.List, format string, dataCh chan string, navonly bool, sess *Session) {
+	start := time.Now()
+	defer benchmarker("AGGREGATOR", "serialize", fmt.Sprintf("%d mementos serialized", basetm.Len()), start, sess)
+	defer close(dataCh)
+
+	dataCh <- fmt.Sprintf("{\n"+`  "original_uri": "%s",`+"\n", urir)
+	//dataCh <- fmt.Sprintf(`!keys ["memento_datetime_YYYYMMDDhhmmss"]` + "\n")
+	//dataCh <- fmt.Sprintf(`!meta {"original_uri": "%s"}`+"\n", urir)
+	//dataCh <- fmt.Sprintf(`!meta {"timegate_uri": "%s/timegate/%s"}`+"\n", *proxy, urir)
+	// dataCh <- fmt.Sprintf(`!meta {"timemap_uri": {"link_format": "%s/timemap/link/%s", "json_format": "%s/timemap/json/%s", "cdxj_format": "%s/timemap/cdxj/%s"}}`+"\n", *proxy, urir, *proxy, urir, *proxy, urir)
+
+	i := 0
+	type Memento struct {
+		Urim     string
+		Datetime int
+	}
+	type Archive struct {
+		First Memento
+		Last  Memento
+		Count int
+	}
+
+	//m := make(map[string]int)
+	archives := make(map[string]Archive)
+	for e := basetm.Front(); e != nil; e = e.Next() {
+		lnk := e.Value.(Link)
+		if navonly && lnk.NavRels == nil {
+			continue
+		}
+		rels := "memento"
+		if lnk.NavRels != nil {
+			rels = strings.Join(lnk.NavRels, " ") + " " + rels
+		}
+		i += 1
+		dataCh <- fmt.Sprintf(`%d`+"\n", i)
+
+		// TODO: create a hash table for each archive and its attributes
+		// NOTE that the temporally first for an archive is likely not the first memento in the whole TimeMap
+		hostbuck := strings.SplitN(lnk.Href, "/", 4)
+		// fmt.Printf(lnk.Timestr)
+		archive, exists := archives[hostbuck[2]]
+		dt, err := strconv.Atoi(lnk.Timestr)
+		if exists {
+			fmt.Printf("%s already exists, checking if first/last\n", hostbuck[2])
+			if err != nil {
+				fmt.Printf("Error converting the datetime to an int")
+				continue
+			}
+			// Check if greater than last, if so, set to last
+			if dt > archive.Last.Datetime {
+				memento := Memento{lnk.Href, dt}
+				archive.Last = memento
+				archives[hostbuck[2]] = archive
+			}
+			// Check if less than first, if so, set to first
+			if dt < archive.First.Datetime {
+				memento := Memento{lnk.Href, dt}
+				archive.First = memento
+				archives[hostbuck[2]] = archive
+			}
+		} else {
+			memento := Memento{lnk.Href, dt}
+			newarchive := Archive{memento, memento, 1}
+			fmt.Printf("Adding to archive, %d \n", archive.Count)
+			archives[hostbuck[2]] = newarchive
+		}
+		dataCh <- fmt.Sprintf(`%s %s`+"\n", lnk.Timeobj.Format(time.RFC3339), lnk.Href)
+		//dataCh <- fmt.Sprintf(`%s {"uri": "%s", "rel": "%s", "datetime": "%s"}`+"\n", lnk.Timestr, lnk.Href, rels, lnk.Datetime)
+	}
+	fmt.Println(archives)
+
 }
 
 func serializeLinks(urir string, basetm *list.List, format string, dataCh chan string, navonly bool, sess *Session) {
@@ -636,6 +711,19 @@ func memgatorService(w http.ResponseWriter, r *http.Request, urir string, format
 		http.Redirect(w, r, closest, http.StatusFound)
 		return
 	}
+	// Format is empty string here
+	fmt.Printf(format)
+	if format == "timemapsummary" {
+		go generateSummary(urir, basetm, format, dataCh, navonly, sess)
+		mime, ok := mimeMap[strings.ToLower(format)]
+		if ok {
+			w.Header().Set("Content-Type", mime)
+		}
+		for dt := range dataCh {
+			fmt.Fprint(w, dt)
+		}
+		return
+	}
 	go serializeLinks(urir, basetm, format, dataCh, navonly, sess)
 	mime, ok := mimeMap[strings.ToLower(format)]
 	if ok {
@@ -663,6 +751,14 @@ func router(w http.ResponseWriter, r *http.Request) {
 			rawuri = p[2]
 		} else {
 			err = fmt.Errorf("/timemap/{FORMAT}/{URI-R} (FORMAT => %s)", responseFormats)
+		}
+	case "timemapsummary":
+		if regs["tmsmpth"].MatchString(requri) {
+			p := strings.SplitN(requri, "/", 2)
+			format = p[0]
+			rawuri = p[1]
+		} else {
+			err = fmt.Errorf("/timemapsummary/{URI-R}")
 		}
 	case "timegate":
 		if regs["tgatpth"].MatchString(requri) {
