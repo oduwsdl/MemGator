@@ -400,6 +400,23 @@ func generateSummary(urir string, basetm *list.List, format string, dataCh chan 
 		dataCh <- fmt.Sprintf(`%s %s`+"\n", lnk.Timeobj.Format(time.RFC3339), lnk.Href)
 		//dataCh <- fmt.Sprintf(`%s {"uri": "%s", "rel": "%s", "datetime": "%s"}`+"\n", lnk.Timestr, lnk.Href, rels, lnk.Datetime)
 	}
+	// Count total mementos in all archives
+	mcount := 0
+	dataCh <- fmt.Sprintf(`"archives": {` + "\n")
+	for host, archive := range archives {
+		mcount += archive.Count
+		dataCh <- fmt.Sprintf(` "%s":{`+"\n", host)
+		dataCh <- fmt.Sprintf(`  "count": %d,"`+"\n", archive.Count)
+		dataCh <- fmt.Sprintf(`  "first":{` + "\n")
+		dataCh <- fmt.Sprintf(`   "datetime": %d,`+"\n", archive.First.Datetime)
+		dataCh <- fmt.Sprintf(`   "uri": "%s",`+"\n  }\n", archive.First.Urim)
+		dataCh <- fmt.Sprintf(`  "last":{` + "\n")
+		dataCh <- fmt.Sprintf(`   "datetime": %d,`+"\n", archive.Last.Datetime)
+		dataCh <- fmt.Sprintf(`   "uri": "%s",`+"\n  }\n", archive.Last.Urim)
+		dataCh <- fmt.Sprintf(" },\n")
+	}
+	dataCh <- fmt.Sprintf(`"total_mementos": %d`, mcount)
+	fmt.Printf("Total memento count: %d\n", mcount)
 	fmt.Println(archives)
 
 }
