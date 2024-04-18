@@ -355,7 +355,7 @@ func generateSummary(urir string, basetm *list.List, format string, dataCh chan 
 		Last  Memento
 		Count int
 	}
-	
+
 	archives := make(map[string]Archive)
 	for e := basetm.Front(); e != nil; e = e.Next() {
 		lnk := e.Value.(Link)
@@ -390,6 +390,8 @@ func generateSummary(urir string, basetm *list.List, format string, dataCh chan 
 				archive.First = memento
 				archives[hostbuck[2]] = archive
 			}
+			archive.Count += 1
+			archives[hostbuck[2]] = archive
 		} else {
 			memento := Memento{lnk.Href, dt}
 			newarchive := Archive{memento, memento, 1}
@@ -706,8 +708,6 @@ func memgatorService(w http.ResponseWriter, r *http.Request, urir string, format
 		http.Redirect(w, r, closest, http.StatusFound)
 		return
 	}
-	// Format is empty string here
-	fmt.Printf(format)
 	if format == "timemapsummary" {
 		go generateSummary(urir, basetm, format, dataCh, navonly, sess)
 		mime, ok := mimeMap[strings.ToLower(format)]
