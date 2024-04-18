@@ -338,13 +338,6 @@ func generateSummary(urir string, basetm *list.List, format string, dataCh chan 
 	start := time.Now()
 	defer benchmarker("AGGREGATOR", "serialize", fmt.Sprintf("%d mementos serialized", basetm.Len()), start, sess)
 	defer close(dataCh)
-
-	dataCh <- fmt.Sprintf("{\n"+`  "original_uri": "%s",`+"\n", urir)
-	//dataCh <- fmt.Sprintf(`!keys ["memento_datetime_YYYYMMDDhhmmss"]` + "\n")
-	//dataCh <- fmt.Sprintf(`!meta {"original_uri": "%s"}`+"\n", urir)
-	//dataCh <- fmt.Sprintf(`!meta {"timegate_uri": "%s/timegate/%s"}`+"\n", *proxy, urir)
-	// dataCh <- fmt.Sprintf(`!meta {"timemap_uri": {"link_format": "%s/timemap/link/%s", "json_format": "%s/timemap/json/%s", "cdxj_format": "%s/timemap/cdxj/%s"}}`+"\n", *proxy, urir, *proxy, urir, *proxy, urir)
-
 	i := 0
 	type Memento struct {
 		Urim     string
@@ -367,8 +360,6 @@ func generateSummary(urir string, basetm *list.List, format string, dataCh chan 
 			rels = strings.Join(lnk.NavRels, " ") + " " + rels
 		}
 		i += 1
-		dataCh <- fmt.Sprintf(`%d`+"\n", i)
-
 		// NOTE that the temporally first for an archive is likely not the first memento in the whole TimeMap
 		hostbuck := strings.SplitN(lnk.Href, "/", 4)
 		archive, exists := archives[hostbuck[2]]
@@ -397,28 +388,26 @@ func generateSummary(urir string, basetm *list.List, format string, dataCh chan 
 			newarchive := Archive{memento, memento, 1}
 			archives[hostbuck[2]] = newarchive
 		}
-		dataCh <- fmt.Sprintf(`%s %s`+"\n", lnk.Timeobj.Format(time.RFC3339), lnk.Href)
-		//dataCh <- fmt.Sprintf(`%s {"uri": "%s", "rel": "%s", "datetime": "%s"}`+"\n", lnk.Timestr, lnk.Href, rels, lnk.Datetime)
 	}
+	dataCh <- fmt.Sprintf("{\n"+` "original_uri": "%s",`+"\n", urir)
 	// Count total mementos in all archives
 	mcount := 0
-	dataCh <- fmt.Sprintf(`"archives": {` + "\n")
+	dataCh <- fmt.Sprintf(` "archives": {` + "\n")
 	for host, archive := range archives {
 		mcount += archive.Count
-		dataCh <- fmt.Sprintf(` "%s":{`+"\n", host)
-		dataCh <- fmt.Sprintf(`  "count": %d,"`+"\n", archive.Count)
-		dataCh <- fmt.Sprintf(`  "first":{` + "\n")
-		dataCh <- fmt.Sprintf(`   "datetime": %d,`+"\n", archive.First.Datetime)
-		dataCh <- fmt.Sprintf(`   "uri": "%s",`+"\n  }\n", archive.First.Urim)
-		dataCh <- fmt.Sprintf(`  "last":{` + "\n")
-		dataCh <- fmt.Sprintf(`   "datetime": %d,`+"\n", archive.Last.Datetime)
-		dataCh <- fmt.Sprintf(`   "uri": "%s",`+"\n  }\n", archive.Last.Urim)
+		dataCh <- fmt.Sprintf(`  "%s":{`+"\n", host)
+		dataCh <- fmt.Sprintf(`   "count": %d,"`+"\n", archive.Count)
+		dataCh <- fmt.Sprintf(`   "first":{` + "\n")
+		dataCh <- fmt.Sprintf(`    "datetime": %d,`+"\n", archive.First.Datetime)
+		dataCh <- fmt.Sprintf(`    "uri": "%s",`+"\n   }\n", archive.First.Urim)
+		dataCh <- fmt.Sprintf(`   "last":{` + "\n")
+		dataCh <- fmt.Sprintf(`    "datetime": %d,`+"\n", archive.Last.Datetime)
+		dataCh <- fmt.Sprintf(`    "uri": "%s",`+"\n   }\n", archive.Last.Urim)
 		dataCh <- fmt.Sprintf(" },\n")
 	}
-	dataCh <- fmt.Sprintf(`"total_mementos": %d`, mcount)
-	fmt.Printf("Total memento count: %d\n", mcount)
+	dataCh <- fmt.Sprintf(` "total_mementos": %d`+"\n", mcount)
+	// Echo out server-side for debugging
 	fmt.Println(archives)
-
 }
 
 func serializeLinks(urir string, basetm *list.List, format string, dataCh chan string, navonly bool, sess *Session) {
