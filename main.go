@@ -355,8 +355,7 @@ func generateSummary(urir string, basetm *list.List, format string, dataCh chan 
 		Last  Memento
 		Count int
 	}
-
-	//m := make(map[string]int)
+	
 	archives := make(map[string]Archive)
 	for e := basetm.Front(); e != nil; e = e.Next() {
 		lnk := e.Value.(Link)
@@ -370,14 +369,11 @@ func generateSummary(urir string, basetm *list.List, format string, dataCh chan 
 		i += 1
 		dataCh <- fmt.Sprintf(`%d`+"\n", i)
 
-		// TODO: create a hash table for each archive and its attributes
 		// NOTE that the temporally first for an archive is likely not the first memento in the whole TimeMap
 		hostbuck := strings.SplitN(lnk.Href, "/", 4)
-		// fmt.Printf(lnk.Timestr)
 		archive, exists := archives[hostbuck[2]]
 		dt, err := strconv.Atoi(lnk.Timestr)
 		if exists {
-			fmt.Printf("%s already exists, checking if first/last\n", hostbuck[2])
 			if err != nil {
 				fmt.Printf("Error converting the datetime to an int")
 				continue
@@ -397,7 +393,6 @@ func generateSummary(urir string, basetm *list.List, format string, dataCh chan 
 		} else {
 			memento := Memento{lnk.Href, dt}
 			newarchive := Archive{memento, memento, 1}
-			fmt.Printf("Adding to archive, %d \n", archive.Count)
 			archives[hostbuck[2]] = newarchive
 		}
 		dataCh <- fmt.Sprintf(`%s %s`+"\n", lnk.Timeobj.Format(time.RFC3339), lnk.Href)
