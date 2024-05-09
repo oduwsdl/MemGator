@@ -4,6 +4,7 @@ import (
 	"container/list"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"math/rand"
@@ -169,7 +170,7 @@ var spoofAgents = []string{
 
 func readArchives() (body []byte, err error) {
 	if !regs["isprtcl"].MatchString(*arcsloc) {
-		body, err = ioutil.ReadFile(*arcsloc)
+		body, err = os.ReadFile(*arcsloc)
 		return
 	}
 	res, err := http.Get(*arcsloc)
@@ -181,7 +182,7 @@ func readArchives() (body []byte, err error) {
 		err = fmt.Errorf(res.Status)
 		return
 	}
-	body, err = ioutil.ReadAll(res.Body)
+	body, err = io.ReadAll(res.Body)
 	return
 }
 
@@ -312,7 +313,7 @@ func fetchTimemap(urir string, arch *Archive, tmCh chan *list.List, wg *sync.Wai
 	}
 	lnks := res.Header.Get("Link")
 	if dttmp == nil {
-		body, err := ioutil.ReadAll(res.Body)
+		body, err := io.ReadAll(res.Body)
 		if err != nil {
 			benchmarker(arch.ID, "timemapfetch", fmt.Sprintf("Response read error in %s", arch.Name), start, sess)
 			logError.Printf("%s => Response read error: %v", arch.ID, err)
