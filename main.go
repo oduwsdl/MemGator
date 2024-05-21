@@ -4,7 +4,7 @@ import (
 	"container/list"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"math/rand"
 	flag "mflag"
@@ -169,7 +169,7 @@ var spoofAgents = []string{
 
 func readArchives() (body []byte, err error) {
 	if !regs["isprtcl"].MatchString(*arcsloc) {
-		body, err = ioutil.ReadFile(*arcsloc)
+		body, err = os.ReadFile(*arcsloc)
 		return
 	}
 	res, err := http.Get(*arcsloc)
@@ -181,7 +181,7 @@ func readArchives() (body []byte, err error) {
 		err = fmt.Errorf(res.Status)
 		return
 	}
-	body, err = ioutil.ReadAll(res.Body)
+	body, err = io.ReadAll(res.Body)
 	return
 }
 
@@ -312,7 +312,7 @@ func fetchTimemap(urir string, arch *Archive, tmCh chan *list.List, wg *sync.Wai
 	}
 	lnks := res.Header.Get("Link")
 	if dttmp == nil {
-		body, err := ioutil.ReadAll(res.Body)
+		body, err := io.ReadAll(res.Body)
 		if err != nil {
 			benchmarker(arch.ID, "timemapfetch", fmt.Sprintf("Response read error in %s", arch.Name), start, sess)
 			logError.Printf("%s => Response read error: %v", arch.ID, err)
@@ -858,8 +858,8 @@ func usage() {
 func initLoggers() {
 	logFatal = log.New(os.Stderr, "FATAL: ", log.Lshortfile)
 	errorHandle := os.Stderr
-	infoHandle := ioutil.Discard
-	benchmarkHandle := ioutil.Discard
+	infoHandle := io.Discard
+	benchmarkHandle := io.Discard
 	if *logfile != "" {
 		lgf, err := os.OpenFile(*logfile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 		if err != nil {
