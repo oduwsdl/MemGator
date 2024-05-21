@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"math/rand"
 	flag "mflag"
@@ -859,8 +858,8 @@ func usage() {
 func initLoggers() {
 	logFatal = log.New(os.Stderr, "FATAL: ", log.Lshortfile)
 	errorHandle := os.Stderr
-	infoHandle := ioutil.Discard
-	benchmarkHandle := ioutil.Discard
+	infoHandle := io.Discard
+	benchmarkHandle := io.Discard
 	if *logfile != "" {
 		lgf, err := os.OpenFile(*logfile, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 		if err != nil {
