@@ -163,7 +163,7 @@ This will generate binaries for various OSes and Architectures in `/tmp/mgbins` 
 
 A publication related to this project appeared in the proceedings of JCDL 2016 ([Read the PDF](https://www.cs.odu.edu/~mln/pubs/jcdl-2016/jcdl-2016-alam-memgator.pdf)). Please cite it as below:
 
-> Sawood Alam and Michael L. Nelson. __MemGator - A Portable Concurrent Memento Aggregator: Cross-Platform CLI and Server Binaries in Go__. In _Proceedings of the 16th ACM/IEEE-CS on Joint Conference on Digital Libraries, JCDL 2016_, pp. 243-244, Newark, New Jersey, USA, June 2016.
+> Sawood Alam and Michael L. Nelson. __MemGator - A Portable Concurrent Memento Aggregator: Cross-Platform CLI and Server Binaries in Go__. In _Proceedings of the 16th ACM/IEEE-CS Joint Conference on Digital Libraries, JCDL 2016_, pp. 243-244, Newark, New Jersey, USA, June 2016.
 
 ```bib
 @inproceedings{jcdl-2016:alam:memgator,
