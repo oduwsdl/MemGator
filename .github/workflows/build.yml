@@ -27,8 +27,20 @@ jobs:
         with:
           name: memgator-bins
           path: /tmp/mgbins
-      - name: Create GitHub Release
+      - name: Check if release already exists
         if: startsWith(github.ref, 'refs/tags/v')
+        id: check_release
+        run: |
+          if gh release view ${{ github.ref_name }} --repo ${{ github.repository }} > /dev/null 2>&1; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "::warning::Release tag ${{ github.ref_name }} already exists — skipping release creation."
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v') && steps.check_release.outputs.exists == 'false'
         uses: softprops/action-gh-release@v2
         with:
           files: /tmp/mgbins/memgator-*
