@@ -9,8 +9,6 @@ on:
       - Build Binaries
     types:
       - completed
-    branches:
-      - master
 
 jobs:
   publish-master:
