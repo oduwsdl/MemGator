@@ -50,6 +50,13 @@ jobs:
         with:
           name: memgator-bins
           path: /tmp/mgbins
+      - name: Create Source Archives
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          git archive --format=tar.gz --prefix=memgator-${{ github.ref_name }}/ HEAD \
+            -o /tmp/mgbins/memgator-${{ github.ref_name }}-source.tar.gz
+          git archive --format=zip --prefix=memgator-${{ github.ref_name }}/ HEAD \
+            -o /tmp/mgbins/memgator-${{ github.ref_name }}-source.zip
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/v')
         uses: softprops/action-gh-release@v2
