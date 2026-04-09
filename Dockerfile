@@ -3,9 +3,10 @@ ARG        ALPINE_TAG=latest
 
 FROM       golang:${GOLANG_TAG} AS builder
 
+ARG        TARGETARCH
 WORKDIR    /app
 COPY       . .
-RUN        GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go install -ldflags="-w -s"
+RUN        GOOS=linux GOARCH=${TARGETARCH} CGO_ENABLED=0 go install -ldflags="-w -s"
 
 
 FROM       alpine:${ALPINE_TAG}
