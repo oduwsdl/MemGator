@@ -28,7 +28,8 @@
     "id": "swap.stanford.edu",
     "name": "Stanford Web Archive",
     "timemap": "https://swap.stanford.edu/timemap/link/",
-    "timegate": "https://swap.stanford.edu/"
+    "timegate": "https://swap.stanford.edu/",
+    "ignore": true
   },
   {
     "id": "waext.banq.qc.ca",
@@ -74,15 +75,29 @@
     "timegate": "https://web.archive.org.au/awa/mp_/"
   },
   {
+    "id": "webarchiveweb.bac-lac.canada.ca",
+    "name": "Library and Archives Canada",
+    "timemap": "https://webarchiveweb.wayback.bac-lac.canada.ca/web/timemap/link/",
+    "timegate": "https://webarchiveweb.wayback.bac-lac.canada.ca/web/"
+  },
+  {
+    "id": "webarchive.loc.gov",
+    "name": "Library of Congress",
+    "timemap": "https://webarchive-beta.loc.gov/playback-services/general/timemap/link/",
+    "timegate": "https://webarchive-beta.loc.gov/playback-services/general/",
+    "ignore": true
+  },
+  {
     "id": "webarchive.nationalarchives.gov",
     "name": "UK National Archives Web Archive",
     "timemap": "https://webarchive.nationalarchives.gov.uk/timemap/",
-    "timegate": "https://webarchive.nationalarchives.gov.uk/timegate/"
+    "timegate": "https://webarchive.nationalarchives.gov.uk/timegate/",
+    "ignore": true
   },
   {
     "id": "webarchive.nrscotland.gov.uk",
     "name": "National Records of Scotland",
-    "timemap": "https://webarchive.nrscotland.gov.uk/timemap/",
+    "timemap": "https://webarchive.nrscotland.gov.uk/timemap/link/",
     "timegate": "https://webarchive.nrscotland.gov.uk/timegate/"
   },
   {
@@ -94,7 +109,7 @@
   {
     "id": "webarchive.parliament.uk",
     "name": "UK Parliament Web Archive",
-    "timemap": "http://webarchive.parliament.uk/timemap/",
+    "timemap": "http://webarchive.parliament.uk/timemap/link/",
     "timegate": "http://webarchive.parliament.uk/timegate/"
   },
   {
@@ -108,6 +123,7 @@
     "id": "wayback.nli.org.il",
     "name": "National Library of Israel",
     "timemap": "https://wayback.nli.org.il/timemap/link/",
-    "timegate": "https://wayback.nli.org.il/"
+    "timegate": "https://wayback.nli.org.il/",
+    "ignore": true
   }
 ]
