@@ -268,6 +268,7 @@ func fetchTimemap(urir string, arch *Archive, tmCh chan *list.List, wg *sync.Wai
 	if dttmp != nil {
 		url = arch.Timegate + urir
 	}
+	logInfo.Printf("%s => Querying: %s", arch.ID, url)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		benchmarker(arch.ID, "timemapfetch", fmt.Sprintf("Request error in %s", arch.Name), start, sess)
